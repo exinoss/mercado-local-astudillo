@@ -1,0 +1,7 @@
+---
+import { readingControls } from '../lib/accessibility-view.js';
+const { placement = 'A' } = Astro.props;
+const controls = readingControls(placement);
+---
+<Fragment set:html={controls.trigger + controls.dialog} />
+<script>import '../scripts/accessibility.js';</script>

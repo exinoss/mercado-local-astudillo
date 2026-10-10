@@ -1,0 +1,67 @@
+@import "tailwindcss" source("../");
+@import "./theme.css";
+
+@layer base {
+  :root { color-scheme:light; }
+  :root[data-contrast=enhanced] {
+    --color-brand:#001c49; --color-ink:#000; --color-muted:#25344a;
+    --color-line:#25344a; --color-card:#25344a; --color-control:#25344a;
+  }
+  :root[data-motion=reduced] *, :root[data-motion=reduced] *::before, :root[data-motion=reduced] *::after { @apply scroll-auto! animate-none! transition-none!; }
+  html { @apply min-[901px]:scroll-pt-[var(--header-offset,170px)]; }
+  body { @apply m-0 bg-page font-sans text-base leading-[1.55] text-ink; }
+  button, input, select, textarea { @apply font-[inherit]; }
+  button, a { @apply touch-manipulation; }
+  button { @apply cursor-pointer text-inherit disabled:cursor-default disabled:opacity-55; }
+  button, input, select { @apply min-h-11; }
+  a { @apply text-inherit underline underline-offset-4; }
+  img { @apply block max-w-full; }
+  svg { @apply size-[1.375rem] shrink-0 align-middle; }
+  h1,h2,h3 { @apply m-0 font-heading font-semibold leading-[1.1]; }
+  p { @apply m-0; }
+  h1,h2,h3,p,a,button,label,dd { @apply wrap-anywhere; }
+  :focus-visible { @apply outline-3 outline-offset-4 outline-brand shadow-[0_0_0_5px_white]; }
+  [hidden] { @apply hidden!; }
+  main [id] { @apply scroll-mt-3; }
+  @media (prefers-reduced-motion:reduce) {
+    *,*::before,*::after { @apply scroll-auto! animate-none! transition-none!; }
+  }
+}
+
+@custom-variant no-js (&:where(.no-js *));
+@custom-variant reading-expanded (&:where([data-text-size="200"] *));
+
+@utility container {
+  @apply mx-auto w-[calc(100%_-_24px)] max-w-[1280px] min-[361px]:w-[calc(100%_-_32px)] min-[601px]:w-[calc(100%_-_44px)] min-[1101px]:w-[calc(100%_-_64px)];
+}
+
+/* Shared controls and window patterns; page composition lives in utility classes. */
+@layer components {
+  .nav-action { @apply inline-flex min-h-11 shrink-0 items-center text-sm no-underline hover:underline focus-visible:underline; }
+  .header-action { @apply flex min-w-11 items-center justify-center gap-[7px] p-[6px] text-sm min-[601px]:px-[7px] min-[601px]:py-[10px] max-[360px]:p-[2px] [&_svg]:max-[360px]:size-5; }
+  .button { @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-[5px] border border-brand bg-brand px-5 py-3 text-[.9375rem] font-bold text-white no-underline hover:brightness-96; }
+  .button.yellow { @apply border-highlight bg-highlight text-ink; }
+  .button.secondary { @apply border-control bg-white text-brand; }
+  .icon-button { @apply grid size-11 min-w-11 shrink-0 place-items-center rounded-[5px] border border-control; }
+  .icon-button[aria-pressed=true] { @apply border-danger bg-favorite text-danger; }
+  .empty { @apply col-span-full rounded-[5px] bg-soft p-7; }
+  .empty h3 { @apply mb-[10px] text-[1.4375rem]; }
+  .empty p { @apply mb-4 text-muted; }
+  .cart-controls { @apply col-span-full flex flex-wrap items-center gap-2; }
+  .cart-controls button { @apply min-h-11 min-w-11 rounded border border-control p-2; }
+  .cart-controls .remove { @apply ml-auto border-transparent underline; }
+  .checkout-form { @apply grid gap-[18px]; }
+  .checkout-form .button { @apply w-full; }
+  .detail-controls { @apply mt-[22px] flex flex-wrap items-stretch gap-[15px] min-[601px]:items-end [&>.button]:max-[600px]:flex-1 [&>.button]:max-[600px]:text-sm; }
+  .checkout-form label { @apply grid gap-[7px]; }
+  .checkout-form select,.checkout-form input:not([type=radio]):not([type=checkbox]),.checkout-form textarea { @apply w-full rounded border border-control bg-white p-[10px] text-ink; }
+  .checkout-form .reading-toggle { @apply flex min-h-11 items-center gap-3; }
+  .reading-toggle input { @apply size-[22px] min-h-[22px] shrink-0 accent-brand; }
+  body:has(.placement-C) { @apply pb-24; }
+  .accessibility-trigger { @apply inline-flex min-h-11 flex-wrap items-center justify-center gap-2 rounded-[5px] border border-control bg-white px-3 py-2 text-sm text-brand; }
+  .market-dialog { @apply m-auto max-h-[calc(100dvh_-_30px)] w-[calc(100%_-_24px)] max-w-[640px] overflow-auto overscroll-contain rounded-[10px] border-0 bg-white p-5 text-ink min-[601px]:p-7; }
+  .market-dialog h2 { @apply my-[14px] text-[1.6875rem] min-[601px]:text-[1.875rem]; }
+  .market-dialog h3 { @apply text-[1.375rem]; }
+  .market-dialog p { @apply my-3; }
+  .market-dialog::backdrop { @apply bg-ink/75; }
+}

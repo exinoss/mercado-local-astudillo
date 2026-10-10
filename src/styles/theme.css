@@ -1,0 +1,27 @@
+@theme {
+  --font-sans: 'DM Sans', Arial, sans-serif;
+  --font-heading: 'Barlow Condensed', Arial, sans-serif;
+  --color-brand: #063176;
+  --color-ink: #00132e;
+  --color-highlight: #f9c31b;
+  --color-accent: #e0121f;
+  --color-danger: #b80e18;
+  --color-muted: #52647c;
+  --color-line: #cad5e3;
+  --color-control: #6b7c93;
+  --color-soft: #eaf0f8;
+  --color-page: #feffff;
+  --color-photo: #dae5f2;
+  --color-card: #b8c7da;
+  --color-promotion: #fffbe8;
+  --color-rating: #815500;
+  --color-favorite: #fff1f3;
+  --shadow-offer: 0 3px 0 #0631760c;
+  --shadow-reading: 0 3px 12px #00132e30;
+}
+
+@font-face { font-family:'DM Sans'; font-style:normal; font-weight:400; font-display:swap; src:url('/fonts/dm-400.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-style:normal; font-weight:500; font-display:swap; src:url('/fonts/dm-500.woff2') format('woff2'); }
+@font-face { font-family:'DM Sans'; font-style:normal; font-weight:700; font-display:swap; src:url('/fonts/dm-700.woff2') format('woff2'); }
+@font-face { font-family:'Barlow Condensed'; font-style:normal; font-weight:600; font-display:swap; src:url('/fonts/barlow-600.woff2') format('woff2'); }
+@font-face { font-family:'Barlow Condensed'; font-style:normal; font-weight:700; font-display:swap; src:url('/fonts/barlow-700.woff2') format('woff2'); }

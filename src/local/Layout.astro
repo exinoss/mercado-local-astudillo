@@ -1,0 +1,32 @@
+---
+import './styles.css';
+import { initialState, seedShops } from './catalog.js';
+import { createViews, defaultVariants } from './views.js';
+import { approvedVariants, pageTitle } from './routes.js';
+const { path = '/', namespace = 'main-v1' } = Astro.props;
+const comparison = namespace === 'proposal-review-v1';
+const views = createViews(comparison ? defaultVariants : approvedVariants, comparison);
+const title = pageTitle(path, seedShops.find(shop => path === `/tiendas/${shop.slug}/`));
+---
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Mercado Local, una propuesta de Carlos Astudillo para descubrir productos, servicios y emprendimientos de San Lorenzo." />
+    <meta name="robots" content="noindex" /><meta name="color-scheme" content="light" /><title>{title}</title>
+    <link rel="icon" href="/favicon.svg" /><link rel="preload" href="/fonts/dm-400.woff2" as="font" type="font/woff2" crossorigin />
+  </head>
+  <body data-namespace={namespace}>
+    <a class="skip-link absolute -top-25 left-3 z-50 bg-white px-5 py-3 focus:top-3" href="#main">Saltar al contenido</a>
+    <div id="local-header" set:html={views.header(initialState(),null)} />
+    <p class="container my-4 rounded border border-danger p-4 text-danger" id="storage-error" role="alert" hidden></p>
+    <noscript><p class="container py-4">Activa JavaScript para guardar datos en este navegador y completar tus recorridos.</p></noscript>
+    <main id="main" tabindex="-1" set:html={views.page(path,new URLSearchParams(),initialState(),null)} />
+    <div id="local-footer" set:html={views.footer()} />
+    <p class="pointer-events-none fixed bottom-20 left-4 right-4 z-9 mx-auto max-w-[700px] rounded border border-control bg-ink p-4 text-white" id="feedback" role="status" aria-live="polite" hidden></p>
+    <div id="reading-controls"></div><div id="reading-dialog"></div>
+    {comparison && <dialog class="market-dialog" id="quick-dialog" aria-labelledby="quick-title"><button class="dialog-close ml-auto block min-w-11 py-2 underline" type="button" data-quick-close>Cerrar</button><div id="quick-content"></div></dialog>}
+    <dialog class="market-dialog" id="confirm-dialog" aria-labelledby="confirm-title"><h2 id="confirm-title">¿Eliminar esta oferta?</h2><p>Se quitará de tu catálogo y carritos. Los pedidos conservan sus detalles.</p><div class="flex flex-wrap gap-3"><button class="button secondary" type="button" data-confirm-close>Conservar oferta</button><button class="button" type="button" data-confirm-yes>Eliminar oferta</button></div></dialog>
+    <script>import './app.js';</script>
+  </body>
+</html>

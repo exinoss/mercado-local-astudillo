@@ -1,0 +1,5 @@
+---
+import LocalLayout from '../local/Layout.astro';
+const { path = Astro.url.pathname } = Astro.props;
+---
+<LocalLayout path={path} namespace="main-v1" />

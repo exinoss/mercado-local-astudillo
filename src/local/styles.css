@@ -1,0 +1,11 @@
+@import "../styles/global.css";
+@layer components {
+  .local-form { @apply max-w-[720px]; }
+  .local-form label { @apply min-w-0; }
+  .local-form input[type=checkbox] { @apply size-5 min-h-5 shrink-0; }
+  .local-form fieldset { @apply min-w-0; }
+  .prose-copy { @apply max-w-[70ch]; }
+  .prose-copy h2 { @apply mt-7 mb-3 text-2xl; }
+  .prose-copy p { @apply mb-4; }
+  .slide-tab[aria-pressed=true] { @apply bg-brand text-white shadow-[inset_0_-3px_0_var(--color-highlight)]; }
+}

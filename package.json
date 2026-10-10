@@ -1,0 +1,27 @@
+{
+  "name": "mercado-local-astro",
+  "type": "module",
+  "version": "0.0.1",
+  "packageManager": "bun@1.4.2",
+  "engines": {
+    "node": ">=22.12.0",
+    "bun": ">=1.4.2"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "dev:background": "astro dev --background",
+    "dev:stop": "astro dev stop",
+    "dev:status": "astro dev status",
+    "dev:logs": "astro dev logs",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@sqlite.org/sqlite-wasm": "^3.53.4-build2",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.3.6",
+    "tailwindcss": "^4.3.3"
+  },
+  "trustedDependencies": ["esbuild"]
+}

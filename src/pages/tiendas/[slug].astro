@@ -1,0 +1,9 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { seedShops } from '../../local/catalog.js';
+
+export function getStaticPaths() {
+  return seedShops.map(shop => ({ params: { slug: shop.slug } }));
+}
+---
+<Layout path={`/tiendas/${Astro.params.slug}/`} />

@@ -1,0 +1,148 @@
+# Mercado Local: idea, estructura y decisiones
+
+Última actualización: 2026-10-09.
+
+Las decisiones confirmadas describen la primera versión. Las cuatro opciones visuales están aprobadas; su integración se registra por separado. Historial y decisiones anteriores conservados en [PROYECTO-anterior.md](./design/propuesta-local/PROYECTO-anterior.md).
+
+## 1. Idea y propósito
+
+Mercado Local es una propuesta de Carlos Astudillo, candidato a la alcaldía de San Lorenzo. La plataforma busca dar visibilidad a comercios y emprendimientos urbanos de San Lorenzo, Esmeraldas, y facilitar descubrir productos y servicios, comparar precios y visitar tiendas. La identidad procede de La Nueva Historia, Partido Social Cristiano, Lista 6; el mercado conserva su nombre y propósito comercial.
+
+La primera versión será un sitio estático con recorridos completos y SQLite persistente en el navegador. Cada persona crea una cuenta local sin activación administrativa. Datos, tiendas y operaciones pertenecen a su perfil en ese navegador; no se comparten con otros visitantes ni se sincronizan con otro dispositivo. No hay backend, servicios de autenticación ni pasarela externa.
+
+El catálogo inicial y sus imágenes son ilustrativos. Una explicación en «Sobre la propuesta» aclara este alcance, la persistencia local y la ausencia de pedidos y cobros reales. La interfaz utilizará términos habituales: Crear cuenta, Iniciar sesión, Mis pedidos y Mi tienda. Se retiran las menciones repetidas a demostraciones. La coordinación con Municipio y Cámara de Comercio se presenta como un modelo propuesto, no como un acuerdo operativo vigente.
+
+## 2. Decisiones confirmadas
+
+| ID | Decisión vigente | Estado o consecuencia |
+| :--- | :--- | :--- |
+| D05 / D10 | Astro, Tailwind y Bun; nombre Mercado Local y San Lorenzo. | Se conserva la base técnica, salida estática y paleta azul, amarillo y rojo. |
+| D12 / D13 / D26 | Productos y servicios de precio fijo; categorías Salud, Tecnología, Comida, Ferretería y Hogar. | Ambos tipos de oferta pertenecen al carrito de su comercio. |
+| D20 / D39 | Cobertura urbana inicial; emergentes durante seis meses calendario. | Expansión a localidades cercanas fuera de esta etapa. |
+| D21 / D22 / D25 | Modalidades y tarifas por tienda; carritos y confirmaciones independientes. | Retiro, entrega o ambas; tarifas por zona configurables. |
+| D30 / D38 | Explorar y usar carritos como visitante; entrar para favoritos y compras. | Una valoración actualizable por cuenta y tienda tras un pedido recibido. |
+| D36 / D44–D49 / D51 | Vitrina de comercios; orden productos y servicios, promociones, mejor calificados y nuevos. | Identidad de La Nueva Historia, fotografías contextualizadas, tarjetas completas, carrusel manual, DRY y utilidades Tailwind. No se reabre la composición aprobada. |
+| D17 / D41 / D42 | Comparación interactiva antes de cambios visuales; accesibilidad y usabilidad. | Esperar elección antes de integrar. WCAG 2.2 AA como objetivo, sin afirmar conformidad completa. |
+| D50 | Herramientas de accesibilidad. | Componente existente reutilizado; botón flotante B aprobado en D58. |
+| D52 | SQLite WebAssembly en el navegador; sin backend ni servicios externos. | Revisa D01, D28, D33 y D40. Cuentas, tiendas, ofertas, promociones, direcciones, carritos, favoritos, pedidos y valoraciones persistentes localmente. Publicación fuera del alcance. |
+| D53 | Registro con nombre, correo y contraseña; acceso, salida y restablecimiento directo. | Revisa D09 y D29. Sin administrador, correos ni códigos. Contraseña derivada con Web Crypto; cuentas propias de este navegador. |
+| D54 | Cuenta y gestión completa de una tienda local por usuario. | Revisa D11, D19, D27 y D31–D33. Crear y editar tienda, catálogo, promociones, modalidades, tarifas y pedidos sin aprobación. Cambios disponibles para el propietario. |
+| D55 | Compras locales completas y pasarela que aprueba al confirmar. | Revisa D08 y D23–D24. Sin datos bancarios ni cobros; Deuna, transferencia y efectivo conservan estado pendiente hasta confirmar su recepción. |
+| D56 | Autoría de Carlos y una explicación única del alcance. | Revisa D14 y las menciones públicas de D37/D48. Texto de pie confirmado: «Mercado Local es una propuesta de Carlos Astudillo, candidato a la alcaldía de San Lorenzo». |
+| D57 | Tareas largas en páginas y detalles con URL propia. | Revisa D16. Modales reservados para acciones breves y lectura; navegación A confirmada en D58. |
+| D58 | Elección del comparador: navegación A, identidad B, catálogo A y accesibilidad B. | Páginas para recorridos principales; marca secundaria en cabecera y pie; tarjetas compactas en dos columnas desde 361 px; botón flotante de accesibilidad. Integración autorizada el 2026-10-09. |
+| D59 | Botón de accesibilidad sólo con el icono, sin texto visible. | Solicitud explícita del usuario el 2026-10-09. Conserva la ubicación flotante B, un área de 48 × 48 px y el nombre accesible «Accesibilidad». Aplicado al componente compartido del sitio y del comparador. |
+
+Estas decisiones derivan de las respuestas del usuario y del plan cuya implementación solicitó. La elección previa de mercado operativo y servidor dentro de Astro fue revisada explícitamente por el usuario: el alcance vigente es completo pero local al navegador.
+
+## 3. Personas y recorridos
+
+| Persona | Recorrido |
+| :--- | :--- |
+| Visitante | Descubrir, buscar por nombre, filtrar categoría, visitar tiendas y añadir ofertas a sus carritos. |
+| Comprador | Crear cuenta o entrar, conservar carritos, guardar favoritos y direcciones, completar compras, consultar pedidos y valorar después de recibir. |
+| Comerciante | Desde la misma cuenta crear su tienda, editar datos y ofertas, definir promociones y entregas, visitar su escaparate y gestionar pedidos locales. |
+
+Una compra desde el escaparate de la tienda propia permite recorrer los dos lados del pedido sin cuentas administrativas ni datos de otros perfiles.
+
+## 4. Arquitectura y reglas funcionales
+
+- Astro genera páginas estáticas. SQLite y Web Crypto se ejecutan en un Worker del navegador; la interfaz usa un repositorio compartido y no ejecuta SQL.
+- Almacenamiento OPFS con opfs-sahpool; Web Locks coordina inicialización y operaciones entre pestañas, cerrando conexiones y pausando el VFS al terminar. No se exigen cabeceras COOP/COEP.
+- Esquema versionado: cuentas y espacios de datos por propietario, con entidades locales en el espacio correspondiente. Transacciones para cambios y confirmaciones. Los perfiles se separan en la aplicación, sin afirmar seguridad de autenticación de servidor.
+- Nombre, correo único en este navegador y contraseña de al menos seis caracteres. Restablecimiento directo con correo y nueva contraseña. No se guardan contraseñas como texto.
+- Carritos del visitante persistentes y combinados al entrar, con máximo 99 unidades por oferta. El antiguo indicador de cuenta no se convierte en cuenta registrada.
+- Cada pedido conserva artículos y precios en centavos del momento de compra. Confirmarlo vacía únicamente su carrito; el identificador de la revisión impide duplicaciones. Borradores guardados mientras se editan y conservados al volver o recargar; copia transitoria por pestaña ante un cierre antes del commit.
+- Productos y servicios tienen precio fijo. Las promociones usan precio anterior mayor que el actual. Oferta oculta o eliminada no admite nuevas compras; los pedidos conservan sus detalles.
+- Pago en línea aprobado al confirmar. Deuna, transferencia y efectivo pendientes; efectivo disponible al retirar. El propietario puede confirmar un pago recibido de su tienda.
+- El comprador puede marcar recibido; el propietario prepara, entrega o cancela pedidos de su tienda. Una valoración de 1–5 estrellas por comercio, actualizable, con comentario opcional de hasta 350 caracteres.
+- Dirección obligatoria al entregar y tarifa por zona; retiro sin dirección. Imágenes JPG/PNG/WebP locales de hasta 5 MB, optimizadas en el navegador.
+- Si el navegador impide persistir, la consulta del catálogo se conserva y los formularios muestran el problema. Borrar datos del sitio elimina cuentas y operaciones locales.
+
+Referencias: [SQLite WASM](https://sqlite.org/wasm/doc/trunk/persistence.md), [paquete oficial](https://github.com/sqlite/sqlite-wasm), [rutas Astro](https://docs.astro.build/en/guides/routing/).
+
+## 5. Páginas y comportamiento
+
+Inicio conserva la composición aprobada. Catálogo, comercios y promociones tienen páginas con búsqueda y categoría en la URL. Ofertas usan /oferta/?id=…; tiendas base conservan /tiendas/[slug]/ y las locales usan /tiendas/ver/?id=… con presentación compartida. Registro, acceso, restablecimiento, cuenta, direcciones, favoritos, carritos, compra, pago, pedidos, detalle de pedido, panel, tienda, edición de oferta, ayuda y propuesta tienen vistas propias.
+
+Atrás y Adelante, filtros y regreso al catálogo deben conservar contexto. Las tareas largas y los detalles de ofertas usan páginas propias. La vista rápida B se conserva solamente como referencia del comparador. Modales breves con Escape, título anunciado y retorno de foco.
+
+## 6. Identidad y decisiones visuales aprobadas
+
+Se conservan Barlow Condensed para títulos y DM Sans para lectura, azul #063176, amarillo #f9c31b, rojo #e0121f, texto #00132e y superficie #feffff. Recursos de lanuevahistoria.tech consultados el 2026-10-09; procedencia y referencia en el README del comparador. La identidad debe ayudar a identificar la propuesta sin desplazar ofertas, tiendas ni categorías.
+
+| Decisión | Opciones | Estado |
+| :--- | :--- | :--- |
+| Navegación | A páginas; B páginas y vista rápida en escritorio. | A aprobada. |
+| Identidad | A pie; B marca secundaria en cabecera y pie; C bloque institucional y pie. | B aprobada. Autoría en pie obligatoria. |
+| Catálogo móvil | A tarjetas compactas; B lectura amplia y promociones breves. | A aprobada: dos columnas desde 361 px. |
+| Accesibilidad | A navegación; B flotante; C barra inferior. | B aprobada: botón flotante con controles existentes. |
+
+El usuario comunicó A/B/A/B en el chat el 2026-10-09. Se registra su elección antes de detener únicamente el servidor del comparador e integrar. No se reabre Vitrina de comercios.
+
+## 7. Estado implementado
+
+Primera versión definida e integrada el 2026-10-09. D58 aplica navegación A, identidad B, catálogo A y accesibilidad B en las 28 páginas estáticas de la aplicación principal. El comparador conserva 29 páginas, alternativas y almacenamiento separado; su servidor está detenido.
+
+| Función | Estado y evidencia |
+| :--- | :--- |
+| Registro, acceso, salida y restablecimiento directo | Implementados; persistencia y perfiles separados comprobados en Chromium y Firefox. |
+| Perfil, direcciones, favoritos y carritos por tienda | Implementados; continuidad tras acceso, recarga, cierre/reapertura y concurrencia comprobadas. |
+| Creación y edición de tienda, catálogo y promociones | Implementadas; tarifas, modalidades, fotografía local optimizada y ocultación/reactivación comprobadas. |
+| Compra, revisión, pago y pedido | Implementados; borradores durante la edición, precios históricos, carrito independiente y confirmación idempotente comprobados. |
+| Gestión de pedido, pago pendiente y valoración | Implementadas; tienda propia, recepción y valoración actualizable comprobadas. |
+| Navegación, búsqueda, categorías y detalles | Implementados; URL propia, regreso con filtros, Atrás/Adelante e identificadores inexistentes comprobados. |
+| Contenido e identidad | Autoría en cabecera/pie, explicación del alcance en la propuesta, textos y metadatos sin etiquetas repetidas; catálogo inicial consolidado. |
+| Accesibilidad y adaptación | Botón flotante integrado; teclado, foco, contraste básico, cinco anchuras, texto 200 % y zoom nativo 400 % en Chromium comprobados. |
+
+**Arquitectura activa:** componentes compartidos en src/local, fuente única del catálogo inicial en src/data/catalog.js, SQLite 3.53.4 en OPFS, Worker, Web Locks y transacciones. El controlador anterior y sus componentes se retiraron de src y se conservan en design/propuesta-local/legacy-src. La aplicación no incorpora estilos de los artefactos históricos ni parámetros de comparación en sus enlaces.
+
+**Verificación de integración del 2026-10-09:** 390 comprobaciones correctas: 67 recorridos Chromium, 15 Firefox, 9 teclado/contraste, 4 migración, 276 adaptación/zoom, 9 edición de comercio y 7 desarrollo y 3 de regreso con posición. Seis pruebas de lógica con 30 aserciones. Compilación correcta de 28 páginas principales y 29 del artefacto. Dos perfiles separados, persistencia al cerrar/reabrir, diez modificaciones entre pestañas, imagen local, pedidos y precios, borradores al recargar, idempotencia, valoración, errores de almacenamiento y navegación comprobados. El zoom nativo 400 % en Chromium permite redistribuir los recorridos y completar una compra. Las 263 comprobaciones previas del comparador se conservan como evidencia de esa fase.
+
+**Correcciones durante la revisión:** filtros que desbordaban y columnas del carrito estrechas con texto al 200 %, tamaño del control flotante, recibos y nombres de zonas legibles, guardado parcial de compra, foco de errores y textos/acentos del catálogo. Formularios desactivados sin JavaScript para impedir envíos convencionales; regreso con posición recuperado desde portada, tienda y catálogo. La prueba de almacenamiento ausente se completó con campos válidos para que la validación HTML permitiera enviarla. El error aparece junto al formulario sin aparentar persistencia. Capturas inspeccionadas; únicamente se bloquearon solicitudes del antivirus inyectado en los contextos de pruebas, sin modificar su configuración.
+
+**Comprobaciones pendientes:** Safari/iOS, lectores de pantalla y auditoría completa de WCAG 2.2 AA. No se afirma conformidad completa. Informes e instrucciones en [design/propuesta-local/README.md](./design/propuesta-local/README.md).
+
+**Servidores:** comparador Bun PID 32260, puerto 4336, detenido tras registrar la elección; proceso y puerto verificados en server.json. La revisión de producción usó una instancia propia en 4337, registrada y detenida al terminar. El servidor del usuario en 4321 se conserva. Inicio y gestión: bun run dev:background, dev:status, dev:logs y dev:stop.
+
+La definición de esta primera versión queda cerrada. Backend, sincronización, actividad comercial real y publicación quedan fuera del alcance vigente.
+
+## 8. Validación y gestión de servidores
+
+Compilar y revisar los recorridos principales en navegador real antes de presentar las opciones. Comprobar 320/390/768/1024/1440 px, texto 200 %, zoom 400 %, teclado, foco, contraste y movimiento reducido. Verificar dos perfiles, persistencia y pestañas, tienda y ofertas, favoritos y carritos, compra editable, doble confirmación, gestión de pedidos, valoración, datos inexistentes y errores de almacenamiento. Documentar qué navegadores se comprobaron y qué queda pendiente; no afirmar auditoría WCAG completa.
+
+El comparador usa puerto propio y SQLite con espacio proposal-review-v1, separado de main-v1 y de la aplicación anterior. Registrar PID, ejecutable, puerto y comando de cierre; conservar el servidor del usuario. Iniciar el proyecto con bun run dev:background y gestionar con dev:status, dev:logs y dev:stop. Instrucciones concretas del comparador en design/propuesta-local/README.md.
+
+## 9. Historial
+
+| Fecha | Cambio |
+| :--- | :--- |
+| 2026-10-07 | Creación del documento con la idea del comercio local municipal, alcance estático, estado del código, propuestas de organización y primeras preguntas. Se registran Bun y los iconos SVG como decisiones previas. |
+| 2026-10-07 | El usuario elige carrito y compra de demostración, acceso con panel de tienda para afiliados y favoritos para compradores. Confirma conservar Mercado Local, San Lorenzo y la paleta actual. Se abren preguntas sobre validación de afiliación, categorías y carrito con varias tiendas. |
+| 2026-10-07 | El usuario confirma la validación conjunta del Municipio y la Cámara de Comercio, la inclusión de servicios y las categorías prioritarias Salud, Tecnología, Comida, Ferretería y Hogar. Se actualizan alcance y modelo propuesto; los cambios de interfaz siguen pendientes de implementación. |
+| 2026-10-07 | En el cuestionario por grupos, el usuario elige contenido ficticio de demostración (1A) y ficha práctica de tienda con nombre (3B más nombre). Solicita aclarar la navegación de la pregunta 2. Se registra el avance del cuestionario de 21 preguntas. |
+| 2026-10-07 | A petición del usuario se crea en la carpeta raíz `desing/` un artefacto interactivo para comparar las tres opciones de navegación, explorar el mismo catálogo y guardar una preferencia local. Verificado en escritorio y móvil con Chrome. La pregunta 2 sigue pendiente hasta comunicar la elección. |
+| 2026-10-07 | Se añade e inicia en segundo plano un servidor local con Bun para el comparador en `http://localhost:4322/`. Verificada la carga del HTML, estilos, JavaScript e imágenes. |
+| 2026-10-07 | El usuario elige 2B: páginas propias para tiendas y ventanas para productos y servicios. Se resuelve P07 y se actualiza el plan; la implementación en la aplicación principal queda pendiente. Se incorpora a `AGENTS.md` y `CLAUDE.md` el flujo obligatorio de prototipo con opciones, servidor local, elección y detención. El servidor del comparador se detiene y se verifica su cierre; las referencias se ajustan a la carpeta actual `design/`. |
+| 2026-10-07 | El usuario responde la ronda 4–6: sustituye las opciones de destacados por dos grupos, mejor calificados y negocios nuevos; elige promociones definidas por cada comercio (5A) y expansión a localidades cercanas con enfoque inicial únicamente urbano en San Lorenzo (6C con alcance inicial). Se registran D18–D20, se actualizan alcance y lógica y se añaden las preguntas 22 y 23 sobre calificaciones y periodo de negocio emergente. Los cambios de interfaz quedan pendientes de un artefacto comparativo y de implementación. |
+| 2026-10-07 | El usuario elige 7C y 8C: modalidades de entrega o retiro según cada tienda y carritos independientes con confirmaciones separadas. En 9 elige el recorrido completo con métodos locales: Deuna, transferencia y pago en efectivo o transferencia al retirar en el local. Se registran D21–D24, se resuelven P10 y P11 y se actualizan alcance, lógica y cuestionario. Se conserva la compra de demostración sin cobros reales; la implementación y la presentación visual siguen pendientes. |
+| 2026-10-07 | El usuario elige 10C, 11A y 12C: tarifas por zona definidas por cada tienda, servicios con precio fijo que se añaden al carrito de su comercio y solicitud de afiliación con datos básicos, descripción, logo, catálogo inicial y documentación de respaldo para revisión conjunta. Se registran D25–D27 y se actualizan alcance, modelo propuesto, lógica y respuestas. Importes y zonas concretas, tipos de documentos, presentación e implementación quedan pendientes. |
+| 2026-10-07 | El usuario incorpora SQLite y elige registro e inicio de sesión mediante formularios (13C con cambio técnico), acceso requerido para confirmar compras y guardar favoritos (14B) y panel completo con pedidos y estadísticas de demostración (15C). Se registran D28–D31 y se revisa D01: el plan deja de estar limitado a un sitio sin base de datos. Se actualizan alcance, perfiles, modelo y lógica; se adapta la pregunta 17 y se añade la 24 sobre ejecución y despliegue. SQLite y autenticación todavía no están implementados; compras, pagos y contenido inicial conservan su carácter de demostración. |
+| 2026-10-07 | El usuario elige 16C, 17A y 18A: cuenta completa del comprador, SQLite para cuentas, favoritos y carritos, y búsqueda por nombre con filtro de categoría. Se registran D32–D34 y se ajusta el plan: catálogo, promociones, tarifas, pedidos y solicitudes de afiliación quedan fuera de SQLite; las funciones correspondientes mantienen el alcance de demostración. Las calificaciones requieren concretar su política en la pregunta 22. |
+| 2026-10-07 | Se crea `design/ronda-visual/` con tres opciones combinables de estilo, orden de portada y política de fotos para las preguntas 19–21. Se inicia su servidor independiente en `http://localhost:4322/` y se registra su proceso. Verificadas 33 interacciones en Chrome y revisadas capturas de escritorio y móvil. Las fotos de renovación son referencias existentes; no se aplica ninguna opción a la aplicación principal mientras la elección siga pendiente. |
+| 2026-10-07 | El usuario elige 19C, 20A y 21C: Plaza local, productos y servicios primero, y conservación de fotos de productos con renovación de portada y comercios. Se registran D35–D37 y se actualizan requisitos, dirección visual, estado y próximos pasos. Se conserva el artefacto C/A/C como referencia; la aplicación principal y las fotos definitivas quedan pendientes de implementación. Se preparan las opciones de seguimiento 22–24 sobre calificaciones, negocios nuevos y ejecución con SQLite. |
+| 2026-10-07 | Después de registrar la elección 19C/20A/21C, se detiene únicamente el servidor del artefacto de esta ronda (Bun, proceso 14224). Se comprueban su cierre y el puerto 4322 sin servicio. El registro de instancia se marca `stopped`; se conservan los archivos del comparador y se actualizan sus instrucciones. |
+| 2026-10-07 | El usuario elige 22C, 23B y 24B: valoraciones después de marcar una compra de demostración como recibida, con comentario opcional; negocios emergentes durante sus primeros seis meses de actividad; y demo online con servidor y SQLite persistente. Se registran D38–D40, se resuelven las 24 respuestas del cuestionario y se actualizan requisitos, modelo, lógica y próximos pasos. SQLite conserva el alcance de cuentas, favoritos y carritos; pedidos y valoraciones siguen siendo de demostración. Proveedor y configuración concretos de alojamiento quedan pendientes; no se implementan funciones ni se publica la aplicación en esta actualización del plan. |
+| 2026-10-08 | El usuario solicita rediseñar el sitio actual mediante aprobación, aplicando `frontend-design`, responsividad, accesibilidad y usabilidad. Se registran D41 y D42 y se amplían las reglas de `AGENTS.md` y `CLAUDE.md`. Se crea `design/rediseno/` con tres composiciones dentro de Plaza local y recorridos de demostración; servidor independiente activo en el puerto 4322, proceso 41384, mientras se espera la elección. Se verifican 83 comprobaciones en Chrome y capturas de varios tamaños; se corrigen la portada C en móvil y la navegación con texto ampliado. En Astro se elimina únicamente un cierre `</Layout>` duplicado y la compilación finaliza correctamente. Rediseño principal, nuevas fotos, SQLite y publicación siguen pendientes. |
+| 2026-10-08 | El usuario aprueba A: Plaza abierta, manteniendo 19C, 20A y 21C. Se registra D43 y se inicia su integración en Astro. Se conserva el comparador como referencia y se cierra únicamente su servidor tras verificar la identidad. |
+| 2026-10-08 | Se completa Plaza abierta en Astro con componentes, catálogo compartido, seis páginas de tiendas y ventanas nativas. Se integran búsqueda, categorías, favoritos, carritos separados, acceso y compra de demostración, historial y una valoración actualizable por tienda después de compra recibida. Estado de demo conservado en la pestaña entre páginas; antigüedad por seis meses calendario. Se generan y optimizan siete imágenes nuevas de portada y comercios; fotos de productos conservadas. Compilación correcta con siete páginas, 77 comprobaciones en Chrome sin errores y 11 de lógica; capturas revisadas. Se detiene el servidor temporal de pruebas sin cerrar el servidor de desarrollo del usuario. SQLite, autenticación real, panel y publicación permanecen pendientes. |
+| 2026-10-08 | El usuario solicita adaptar la identidad a lanuevahistoria.tech y confirma mantener Mercado Local; pide carrusel comercial, guía estructural de PROYECTO.md y prioridad del propósito, tarjetas completas e imágenes sin fondo blanco. Se registran D44–D47 y se actualizan AGENTS.md y CLAUDE.md. Se consultan los recursos de la referencia y se crea design/identidad-carrusel/ con tres composiciones interactivas, fuentes locales y cinco fotografías contextualizadas generadas. Servidor propio disponible en 4322, PID 38108, mientras se decide. Revisadas capturas móviles y de escritorio, recortes corregidos y 95 comprobaciones en Chrome sin errores. La composición y su integración en Astro quedan pendientes de elección; se mantiene la aplicación principal y el alcance de persistencia acordado. |
+| 2026-10-08 | El usuario aprueba C: Vitrina de comercios conservando Mercado Local, identidad de La Nueva Historia, carrusel comercial, tarjetas, fotos contextualizadas, orden 20A y recorridos. Se registra D48, se detiene y verifica el servidor propio del comparador y se integra C en Astro. Fuentes locales, precios y tiendas del catálogo compartido, enlaces reales y carrusel manual accesible; fotos nuevas en portada, tiendas y detalles. Compilación de siete páginas, 90 comprobaciones en Chrome sobre build, 11 de lógica y 11 recorridos breves en el servidor existente correctos. Comparadores conservados; estado técnico de SQLite y cuentas sin cambios. |
+| 2026-10-08 | El usuario solicita DRY, uso pleno de Tailwind, botón de accesibilidad, buena UI/UX, adaptación y validación incremental, cierre de servidores propios e instrucciones de inicio. Se registran D49 y D50. Se unifican estilos en Tailwind con @theme, @apply y utilidades, se retira CSS obsoleto y se comparten encabezados, catálogos y ciclo de ventanas. Componente de lectura preparado y probado en design/accesibilidad, con ubicación A/B/C pendiente de elección; aún no incorporado a Astro. Compilación de siete páginas; 90 comprobaciones del mercado, 11 en desarrollo, 50 del comparador y 19 de lectura real correctas. Se corrige desbordamiento de flechas al 200 % y se revisan capturas. Servidores propios 4322 y 4323 detenidos y verificados por petición del usuario; instrucciones de inicio y reinicio documentadas. |
+| 2026-10-09 | El usuario solicita migrar a utilidades Tailwind conservando el diseño actual (D51). Se trasladan estilos de composición al marcado y a renderizadores compartidos, se mantienen patrones repetidos y se limita la detección a src. global.css pasa de 221 a 67 líneas y el CSS compilado se reduce un 16 %. Compilación de siete páginas; 154 comparaciones visuales, 17 comprobaciones funcionales y 8 en desarrollo correctas. Referencia y evidencias conservadas en design/tailwind-migration. Servidores propios 4334/4335 detenidos y verificados; instancia del usuario en 4321 conservada. La ubicación de accesibilidad continúa pendiente de elección. |
+| 2026-10-09 | Se corrige la configuración de VS Code ante el diagnóstico css-semicolonexpected en la directiva válida de Tailwind 4 `@import "tailwindcss" source("../")`. Los archivos src/styles/*.css se asocian al modo Tailwind CSS y se recomienda su extensión oficial. Compilación de siete páginas correcta; diseño y estilos sin cambios. |
+| 2026-10-09 | El usuario solicita implementar el plan revisado: propuesta estática de Carlos Astudillo, SQLite persistente en navegador, cuentas locales con restablecimiento directo, tienda propia sin activación, pedidos y pago local aprobado al confirmar. Se registran D52–D57, se conserva íntegro el documento anterior, se cierra la definición funcional y se preparan cuatro decisiones visuales mediante comparador. Integración en la aplicación principal pendiente de elección. |
+| 2026-10-09 | Comparador disponible en 4336 con 29 páginas y componentes/repositorio compartidos preparados para integrar tras elección. SQLite WASM 3.53.4/OPFS con perfiles locales y coordinación de pestañas; recorridos de comprador y tienda, pasarela local y migración de carritos anteriores implementados en el artefacto. 263 comprobaciones de navegador y cinco pruebas de lógica correctas. Compilación principal de siete páginas conservada; servidor del usuario sin detener. Navegación, identidad, catálogo móvil y accesibilidad pendientes de aprobación; Safari/iOS, lectores de pantalla y zoom nativo 400 % pendientes de revisar. |
+| 2026-10-09 | El usuario aprueba A/B/A/B: páginas, marca secundaria en cabecera y pie, catálogo compacto de dos columnas desde 361 px y accesibilidad flotante. Se registra D58 y se autoriza integrar los recorridos compartidos en la aplicación principal; las otras opciones se conservan como referencia. |
+| 2026-10-09 | Se integra D58 en 28 páginas estáticas: SQLite/OPFS y recorridos de comprador/comerciante activos, identidad B, catálogo A y accesibilidad B. Se retira el controlador anterior conservando referencias; catálogo inicial único y contenido revisado. 390 comprobaciones de integración y seis pruebas de lógica correctas; texto 200 % y zoom nativo 400 % en Chromium comprobados. Comparador 4336 detenido y artefacto conservado; revisión 4337 cerrada, instancia del usuario 4321 conservada. Safari/iOS, lectores de pantalla y auditoría completa pendientes; publicación fuera del alcance. |
+| 2026-10-09 | El usuario solicita el botón de accesibilidad sólo con icono (D59). Se reutiliza la opción B del artefacto y se aplica la indicación explícita al componente compartido, sin reabrir la elección. Compilación de 28 páginas correcta; icono sin texto y área de 48 × 48 px comprobados en Chromium a 320, 390, 768, 1024 y 1440 px. Lectura al 200 %, apertura con teclado, cierre con Escape y devolución del foco correctos. Servidor temporal de revisión 4338 detenido y puerto cerrado. |

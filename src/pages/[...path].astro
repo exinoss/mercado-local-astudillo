@@ -1,0 +1,13 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { localPagePaths } from '../local/routes.js';
+
+export function getStaticPaths() {
+  return localPagePaths.filter(path => path !== '/').map(path => ({
+    params: { path: path.slice(1, -1) },
+    props: { path },
+  }));
+}
+const { path } = Astro.props;
+---
+<Layout path={path} />
