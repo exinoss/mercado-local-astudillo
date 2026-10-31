@@ -1,4 +1,6 @@
-import { catalog, cents, dollars, initialState, categories } from './catalog.js';
+import { catalog, cents, dollars, initialState, categories, pruneCarts } from './catalog.js';
+import {phoneNumber} from '../lib/services.js';
+import {isCalendarDate} from '../lib/market.js';
 const text = (value, max = 350) => String(value || '').trim().slice(0, max);
 const required = (value, label, max) => { const result = text(value, max); if (!result) throw new Error(`Completa ${label}.`); return result; };
 const price = value => { const result = Number(value); if (!Number.isFinite(result) || result < 0 || result > 1000000) throw new Error('Introduce un precio válido.'); return dollars(cents(result)); };
@@ -6,16 +8,23 @@ function validImage(value) { const result = String(value || '').trim(); if (resu
 function quantity(value) { const result = Number(value); if (!Number.isInteger(result) || result < 1 || result > 99) throw new Error('La cantidad debe estar entre 1 y 99.'); return result; }
 export function cartItems(state, shopId) {
   const data = catalog(state);
-  return Object.entries(state.carts[shopId] || {}).map(([id, qty]) => { const offer = data.offers.find(item => item.id === id && item.shop === shopId); return offer ? { ...offer, qty, lineCents: cents(offer.price) * qty } : null; }).filter(Boolean);
+  return Object.entries(state.carts[shopId] || {}).map(([id, qty]) => { const offer = data.offers.find(item => item.id === id && item.shop === shopId && item.kind==='Producto'); return offer ? { ...offer, qty, lineCents: cents(offer.price) * qty } : null; }).filter(Boolean);
 }
+export function checkoutQuote(state, store, draft) {
+  const items=cartItems(state,store.id).map(item=>({id:item.id,name:item.name,priceCents:cents(item.price),qty:item.qty}));
+  const feeCents=draft.mode==='entrega'?cents(store.deliveryFees[draft.zone]):0;
+  return {items,feeCents,totalCents:items.reduce((sum,item)=>sum+item.priceCents*item.qty,feeCents)};
+}
+export const sameQuote = (left,right) => Boolean(left&&right)&&JSON.stringify(left)===JSON.stringify(right);
 export function transition(previous, action, payload = {}, authenticated = true) {
   const state = structuredClone(previous || initialState());
+  pruneCarts(state);
   if (!authenticated && !['add', 'quantity', 'remove', 'migrate'].includes(action)) throw new Error('Entra a tu cuenta para continuar.');
   const data = catalog(state);
   const offer = id => { const item = data.offers.find(item => item.id === id); if (!item) throw new Error('Esta oferta ya no está disponible.'); return item; };
   const shop = id => { const item = data.shops.find(item => item.id === id); if (!item) throw new Error('No encontramos esta tienda.'); return item; };
   const ownerShop = id => { const item = state.shops.find(item => item.id === id); if (!item) throw new Error('Esta tienda no pertenece a tu cuenta.'); return item; };
-  if (action === 'add') { const item = offer(payload.id); const cart = state.carts[item.shop] ||= {}; cart[item.id] = Math.min(99, (cart[item.id] || 0) + quantity(payload.qty || 1)); }
+  if (action === 'add') { const item = offer(payload.id); if(item.kind==='Servicio')throw new Error('Contacta directamente al profesional para solicitar este servicio.');const cart = state.carts[item.shop] ||= {}; cart[item.id] = Math.min(99, (cart[item.id] || 0) + quantity(payload.qty ?? 1)); }
   else if (action === 'quantity') { const item = offer(payload.id); if (!state.carts[item.shop]?.[item.id]) throw new Error('La oferta no está en el carrito.'); state.carts[item.shop][item.id] = quantity(payload.qty); }
   else if (action === 'remove') { const item = offer(payload.id); delete state.carts[item.shop]?.[item.id]; if (!Object.keys(state.carts[item.shop] || {}).length) delete state.carts[item.shop]; }
   else if (action === 'favorite') { offer(payload.id); state.favorites = state.favorites.includes(payload.id) ? state.favorites.filter(id => id !== payload.id) : [...state.favorites, payload.id]; }
@@ -27,12 +36,18 @@ export function transition(previous, action, payload = {}, authenticated = true)
     const modes = ['retiro', 'entrega'].filter(mode => payload.deliveryModes?.includes(mode)); if (!modes.length) throw new Error('Elige retiro, entrega o ambas modalidades.');
     if (!categories.includes(payload.category) || payload.category === 'Todas') throw new Error('Elige una categoría.');
     const item = { id: existing?.id || crypto.randomUUID(), name: required(payload.name, 'el nombre de la tienda', 90), category: payload.category, description: required(payload.description, 'la descripción', 350), address: required(payload.address, 'la dirección', 160), hours: required(payload.hours, 'el horario', 100), contact: text(payload.contact, 80), startedAt: payload.startedAt, image: validImage(payload.image || existing?.image), deliveryModes: modes, delivery: modes.length === 2 ? 'Retiro y entrega a domicilio' : modes[0] === 'entrega' ? 'Entrega a domicilio' : 'Retiro en el local', deliveryFees: { centro: price(payload.centro), urbana: price(payload.urbana) } };
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(item.startedAt || '') || !Number.isFinite(Date.parse(item.startedAt))) throw new Error('Indica la fecha de inicio de actividad.');
+    if (!isCalendarDate(item.startedAt)) throw new Error('Indica una fecha válida de inicio de actividad.');
     state.shops = [item];
   } else if (action === 'offer') {
     ownerShop(payload.shop); if (payload.id && !state.offers.some(item => item.id === payload.id)) throw new Error('No puedes editar esta oferta.');
     if (!categories.includes(payload.category) || payload.category === 'Todas') throw new Error('Elige una categoría.');
     const item = { id: payload.id || crypto.randomUUID(), shop: payload.shop, name: required(payload.name, 'el nombre de la oferta', 100), category: payload.category, description: required(payload.description, 'la descripción', 350), price: price(payload.price), kind: payload.kind === 'Servicio' ? 'Servicio' : 'Producto', image: validImage(payload.image), icon: payload.kind === 'Servicio' ? 'tools' : 'shop', available: payload.available !== false };
+    if(item.kind==='Servicio'){
+      item.trade=required(payload.trade||item.name,'el oficio o especialidad',80);
+      item.professional=text(payload.professional,90);
+      item.activities=String(payload.activities||'').split(/\r?\n/).map(value=>text(value,160)).filter(Boolean).slice(0,20);
+      for(const key of ['phone','whatsapp']){const value=text(payload[key],40);if(value&&!phoneNumber(value))throw new Error('Introduce un teléfono válido con código de país o número local.');item[key]=value?phoneNumber(value):'';}
+    }
     if (payload.old !== '' && payload.old != null) { item.old = price(payload.old); if (item.old <= item.price) throw new Error('El precio anterior debe ser mayor que el actual.'); }
     state.offers = [...state.offers.filter(entry => entry.id !== item.id), item];
   } else if (action === 'delete-offer') {
@@ -58,12 +73,14 @@ export function transition(previous, action, payload = {}, authenticated = true)
     const allowed = mode === 'retiro' ? ['pasarela', 'deuna', 'transferencia', 'efectivo'] : ['pasarela', 'deuna', 'transferencia'];
     if (!allowed.includes(payload.payment)) throw new Error('Elige un método de pago disponible.');
     const draft = { id: payload.id || state.drafts[store.id]?.id || crypto.randomUUID(), shop: store.id, mode, payment: payload.payment, zone: payload.zone === 'urbana' ? 'urbana' : 'centro', address: mode === 'entrega' ? required(payload.address, 'la dirección de entrega', 160) : '', notes: text(payload.notes, 160) };
-    state.drafts[store.id] = draft;
+    draft.quote = checkoutQuote(state,store,draft);
     if (action === 'order') {
-      const feeCents = mode === 'entrega' ? cents(store.deliveryFees[draft.zone]) : 0;
-      state.orders.unshift({ ...draft, shopName: store.name, items: items.map(item => ({ id: item.id, name: item.name, priceCents: cents(item.price), qty: item.qty })), feeCents, totalCents: items.reduce((sum, item) => sum + item.lineCents, feeCents), status: 'confirmado', paymentStatus: draft.payment === 'pasarela' ? 'pagado' : 'pendiente', createdAt: new Date().toISOString() });
+      const reviewed=state.drafts[store.id];
+      if(!sameQuote(reviewed,draft)||!sameQuote(payload.quote,draft.quote))throw new Error('Tu compra ha cambiado. Vuelve a editar los datos y revisar el total antes de confirmar.');
+      const {quote,...details}=draft;
+      state.orders.unshift({ ...details, shopName: store.name, ...quote, status: 'confirmado', paymentStatus: draft.payment === 'pasarela' ? 'pagado' : 'pendiente', createdAt: new Date().toISOString() });
       delete state.carts[store.id]; delete state.drafts[store.id];
-    }
+    } else state.drafts[store.id] = draft;
   } else if (action === 'order-status') {
     const order = state.orders.find(item => item.id === payload.id); if (!order) throw new Error('No encontramos este pedido.');
     if (payload.status === 'recibido') { if (order.status === 'cancelado') throw new Error('El pedido está cancelado.'); order.status = 'recibido'; }
@@ -74,7 +91,7 @@ export function transition(previous, action, payload = {}, authenticated = true)
     const stars = Number(payload.stars); if (!Number.isInteger(stars) || stars < 1 || stars > 5) throw new Error('Elige de 1 a 5 estrellas.');
     state.ratings[payload.shop] = { stars, comment: text(payload.comment) };
   } else if (action === 'migrate') {
-    for (const [store, cart] of Object.entries(payload.carts || {})) for (const [id, qty] of Object.entries(cart || {})) if (data.offers.some(item => item.id === id && item.shop === store) && Number.isInteger(qty) && qty > 0 && qty <= 99) (state.carts[store] ||= {})[id] = Math.min(99, (state.carts[store]?.[id] || 0) + qty);
+    for (const [store, cart] of Object.entries(payload.carts || {})) for (const [id, qty] of Object.entries(cart || {})) if (data.offers.some(item => item.id === id && item.shop === store && item.kind==='Producto') && Number.isInteger(qty) && qty > 0 && qty <= 99) (state.carts[store] ||= {})[id] = Math.min(99, (state.carts[store]?.[id] || 0) + qty);
   } else throw new Error('Esta acción no está disponible.');
-  return state;
+  pruneCarts(state);return state;
 }

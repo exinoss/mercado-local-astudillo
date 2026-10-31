@@ -1,5 +1,6 @@
 {
   "name": "mercado-local-astro",
+  "private": true,
   "type": "module",
   "version": "0.0.1",
   "packageManager": "bun@1.4.2",
@@ -14,6 +15,11 @@
     "dev:status": "astro dev status",
     "dev:logs": "astro dev logs",
     "build": "astro build",
+    "test": "bun test src/ && node --test .codex/hooks/load-memory.test.cjs",
+    "test:browser": "node scripts/smoke-browser.mjs",
+    "check:repo": "node scripts/verify-repository.mjs",
+    "check:dist": "node scripts/verify-dist.mjs",
+    "check": "bun run check:repo && bun run test && bun run build && bun run check:dist",
     "preview": "astro preview",
     "astro": "astro"
   },

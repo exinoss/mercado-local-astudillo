@@ -1,4 +1,5 @@
 import { svg } from './icons.js';
+import {logoPauseButton} from './animated-logo.js';
 export function readingControls(placement = 'A') {
   const position = ['A','B','C'].includes(placement) ? placement : 'A';
   const placements = {
@@ -18,6 +19,7 @@ export function readingControls(placement = 'A') {
         </select></label>
         <label class="reading-toggle" for="reading-contrast"><input id="reading-contrast" name="contrast" type="checkbox">Contraste reforzado</label>
         <label class="reading-toggle" for="reading-motion"><input id="reading-motion" name="reducedMotion" type="checkbox">Reducir movimiento</label>
+        <fieldset class="grid gap-3 rounded-lg border border-line p-4"><legend class="px-1 font-bold">Animaciones</legend>${logoPauseButton('button secondary')}<div data-carousel-control><button type="button" class="button secondary" data-carousel-pause>Pausar cambio automático del carrusel</button></div></fieldset>
         <button class="button secondary" type="reset">Restablecer ajustes</button>
       </form>
       <p class="text-sm text-muted" role="status" aria-live="polite" aria-atomic="true"></p>

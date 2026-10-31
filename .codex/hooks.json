@@ -1,0 +1,29 @@
+{
+  "description": "Carga la memoria local de Mercado Local al iniciar, reanudar o compactar una sesi\u00f3n.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"require(require('node:child_process').execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()+'/.codex/hooks/load-memory.cjs')\"",
+            "timeout": 10,
+            "statusMessage": "Cargando memoria local de Mercado Local",
+            "additionalContextLimit": 16000
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "graphify hook-check"
+          }
+        ]
+      }
+    ]
+  }
+}

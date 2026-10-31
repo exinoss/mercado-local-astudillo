@@ -4,11 +4,12 @@
 @layer base {
   :root { color-scheme:light; }
   :root[data-contrast=enhanced] {
-    --color-brand:#001c49; --color-ink:#000; --color-muted:#25344a;
-    --color-line:#25344a; --color-card:#25344a; --color-control:#25344a;
+    --color-brand:#063176; --color-ink:#00132E; --color-muted:#00132E;
+    --color-line:#063176; --color-card:#063176; --color-control:#063176;
   }
   :root[data-motion=reduced] *, :root[data-motion=reduced] *::before, :root[data-motion=reduced] *::after { @apply scroll-auto! animate-none! transition-none!; }
   html { @apply min-[901px]:scroll-pt-[var(--header-offset,170px)]; }
+  input::placeholder,textarea::placeholder { @apply text-muted opacity-100; }
   body { @apply m-0 bg-page font-sans text-base leading-[1.55] text-ink; }
   button, input, select, textarea { @apply font-[inherit]; }
   button, a { @apply touch-manipulation; }
@@ -39,9 +40,9 @@
 @layer components {
   .nav-action { @apply inline-flex min-h-11 shrink-0 items-center text-sm no-underline hover:underline focus-visible:underline; }
   .header-action { @apply flex min-w-11 items-center justify-center gap-[7px] p-[6px] text-sm min-[601px]:px-[7px] min-[601px]:py-[10px] max-[360px]:p-[2px] [&_svg]:max-[360px]:size-5; }
-  .button { @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-[5px] border border-brand bg-brand px-5 py-3 text-[.9375rem] font-bold text-white no-underline hover:brightness-96; }
+  .button { @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-accent bg-accent px-5 py-3 text-[.9375rem] font-bold text-white no-underline hover:brightness-96; }
   .button.yellow { @apply border-highlight bg-highlight text-ink; }
-  .button.secondary { @apply border-control bg-white text-brand; }
+  .button.secondary { @apply border-brand bg-white text-brand; }
   .icon-button { @apply grid size-11 min-w-11 shrink-0 place-items-center rounded-[5px] border border-control; }
   .icon-button[aria-pressed=true] { @apply border-danger bg-favorite text-danger; }
   .empty { @apply col-span-full rounded-[5px] bg-soft p-7; }
@@ -64,4 +65,13 @@
   .market-dialog h3 { @apply text-[1.375rem]; }
   .market-dialog p { @apply my-3; }
   .market-dialog::backdrop { @apply bg-ink/75; }
+}
+
+@layer utilities {
+  select:not([multiple]) {
+    @apply appearance-none pe-11;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23063176' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 7.5 5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right .8rem center;background-size:1.25rem;
+  }
+  @media(forced-colors:active) { select:not([multiple]) { appearance:auto;background-image:none;padding-inline-end:.5rem; } }
 }

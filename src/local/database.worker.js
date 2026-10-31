@@ -1,6 +1,6 @@
 import sqlite3InitModule from '@sqlite.org/sqlite-wasm';
 import wasmUrl from '@sqlite.org/sqlite-wasm/sqlite3.wasm?url';
-import { initialState } from './catalog.js';
+import { initialState, pruneCarts } from './catalog.js';
 import { transition } from './transitions.js';
 let sqlite, pool;
 const hex = bytes => [...new Uint8Array(bytes)].map(byte => byte.toString(16).padStart(2, '0')).join('');
@@ -8,7 +8,7 @@ const unhex = value => new Uint8Array(value.match(/.{2}/g).map(byte => parseInt(
 async function derive(password, salt) { const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']); return hex(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: unhex(salt), iterations: 100000 }, key, 256)); }
 function email(value) { const result = String(value || '').trim().toLowerCase(); if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(result) || result.length > 160) throw new Error('Introduce un correo válido.'); return result; }
 function password(value) { if (typeof value !== 'string' || value.length < 6 || value.length > 200) throw new Error('Usa una contraseña de 6 a 200 caracteres.'); return value; }
-const read = (db, owner) => { const row = db.selectObject('SELECT data FROM workspaces WHERE owner=?', [owner]); return row ? JSON.parse(row.data) : initialState(); };
+const read = (db, owner) => { const row = db.selectObject('SELECT data FROM workspaces WHERE owner=?', [owner]); const state=row?JSON.parse(row.data):initialState();if(pruneCarts(state))write(db,owner,state);return state; };
 const write = (db, owner, state) => db.exec({ sql: 'INSERT INTO workspaces(owner,data) VALUES(?,?) ON CONFLICT(owner) DO UPDATE SET data=excluded.data', bind: [owner, JSON.stringify(state)] });
 async function execute({ namespace, operation, args = {} }) {
   if (!/^[a-z0-9-]{1,60}$/.test(namespace)) throw new Error('Almacenamiento inválido.');
