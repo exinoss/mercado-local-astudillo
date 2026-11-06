@@ -3,6 +3,10 @@
 Sitio estático para descubrir comercios, productos, promociones y profesionales de San Lorenzo,
 Esmeraldas. Propuesta de Carlos Astudillo, construida con Astro, Tailwind y Bun.
 
+Publicado en [mercado.lanuevahistoria.tech](https://mercado.lanuevahistoria.tech/) mediante Cloudflare Pages, conectado al repositorio `exinoss/mercado-local-astudillo`. Dominio activo con SSL y portada funcionando confirmados por el usuario el 2026-10-10. Dirección de Pages: [mercado-local-astudillo.pages.dev](https://mercado-local-astudillo.pages.dev/). La validación completa de recorridos en el alojamiento público queda pendiente.
+
+El sitio principal continúa en el VPS de Hostinger. SQLite conserva los datos de cada navegador y origen: las cuentas de localhost o de `pages.dev` no se trasladan al subdominio. La etiqueta `noindex` existente se conserva.
+
 **Alcance de esta publicación:** cuentas, tiendas, carritos y pedidos guardados únicamente en
 el navegador mediante SQLite WASM/OPFS. No hay sincronización, autenticación de servidor ni
 cobros reales. El catálogo y sus fotografías iniciales son ilustrativos. Restablecer la contraseña
