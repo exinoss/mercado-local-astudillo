@@ -2,7 +2,20 @@ import sqlite3InitModule from '@sqlite.org/sqlite-wasm';
 import wasmUrl from '@sqlite.org/sqlite-wasm/sqlite3.wasm?url';
 import { initialState } from './catalog.js';
 import { transition } from './transitions.js';
-let sqlite, pool;
+let sqlite, pool, privateMode;
+// Firefox en modo privado bloquea OPFS (SecurityError en getDirectory); allí la base vive en memoria y se copia a IndexedDB, que dura la sesión privada.
+const idb = (mode, run) => new Promise((resolve, reject) => { const open = indexedDB.open('mercado-local-private', 1); open.onupgradeneeded = () => open.result.createObjectStore('files'); open.onerror = () => reject(open.error); open.onsuccess = () => { const tx = open.result.transaction('files', mode), request = run(tx.objectStore('files')); tx.oncomplete = () => { open.result.close(); resolve(request.result); }; tx.onerror = () => reject(tx.error); }; });
+async function openDb(namespace) {
+  privateMode ??= await navigator.storage.getDirectory().then(() => false, () => true);
+  if (!privateMode) {
+    if (!pool) pool = await sqlite.installOpfsSAHPoolVfs({ name: 'local-' + namespace, directory: '.mercado-' + namespace, initialCapacity: 6, preserveOnInitFailure: true });
+    else await pool.unpauseVfs();
+    return new pool.OpfsSAHPoolDb('/mercado.sqlite');
+  }
+  const db = new sqlite.oo1.DB(':memory:'), bytes = await idb('readonly', store => store.get(namespace));
+  if (bytes) db.checkRc(sqlite.capi.sqlite3_deserialize(db.pointer, 'main', sqlite.wasm.allocFromTypedArray(bytes), bytes.byteLength, bytes.byteLength, sqlite.capi.SQLITE_DESERIALIZE_FREEONCLOSE | sqlite.capi.SQLITE_DESERIALIZE_RESIZEABLE));
+  return db;
+}
 const hex = bytes => [...new Uint8Array(bytes)].map(byte => byte.toString(16).padStart(2, '0')).join('');
 const unhex = value => new Uint8Array(value.match(/.{2}/g).map(byte => parseInt(byte, 16)));
 async function derive(password, salt) { const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']); return hex(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: unhex(salt), iterations: 100000 }, key, 256)); }
@@ -17,9 +30,7 @@ async function execute({ namespace, operation, args = {} }) {
     let db;
     try {
       sqlite ||= await sqlite3InitModule({ locateFile: file => file.endsWith('.wasm') ? wasmUrl : file });
-      if (!pool) pool = await sqlite.installOpfsSAHPoolVfs({ name: 'local-' + namespace, directory: '.mercado-' + namespace, initialCapacity: 6, preserveOnInitFailure: true });
-      else await pool.unpauseVfs();
-      db = new pool.OpfsSAHPoolDb('/mercado.sqlite');
+      db = await openDb(namespace);
       const version = db.selectValue('PRAGMA user_version');
       if (version > 1) throw new Error('Los datos pertenecen a una versión más reciente. Actualiza el sitio.');
       db.exec('BEGIN IMMEDIATE');
@@ -48,7 +59,9 @@ async function execute({ namespace, operation, args = {} }) {
       } else if (operation === 'read') result = { state: read(db, owner), account: owner === 'guest' ? null : db.selectObject('SELECT id,email,name FROM accounts WHERE id=?', [owner]), version: 1, engine: sqlite.version.libVersion };
       else if (operation === 'mutate') { const state = transition(read(db, owner), args.action, args.payload, owner !== 'guest'); write(db, owner, state); if (args.action === 'profile') db.exec({ sql: 'UPDATE accounts SET name=? WHERE id=?', bind: [state.profile.name, owner] }); result = state; }
       else throw new Error('Operación desconocida.');
-      db.exec('COMMIT'); return result;
+      db.exec('COMMIT');
+      if (privateMode && operation !== 'read') await idb('readwrite', store => store.put(sqlite.capi.sqlite3_js_db_export(db), namespace));
+      return result;
     } catch (error) { try { db?.exec('ROLLBACK'); } catch {} throw error; }
     finally { db?.close(); if (pool && !pool.isPaused()) pool.pauseVfs(); }
   });

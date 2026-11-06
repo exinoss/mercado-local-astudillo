@@ -2,6 +2,10 @@
 
 Propuesta de Carlos Astudillo, candidato a la alcaldía de San Lorenzo. Sitio estático con Astro, Tailwind y SQLite WebAssembly persistente en el navegador.
 
+Publicado en [mercado.lanuevahistoria.tech](https://mercado.lanuevahistoria.tech/) mediante Cloudflare Pages, conectado al repositorio `exinoss/mercado-local-astudillo`. Dominio activo con SSL y portada funcionando confirmados por el usuario el 2026-10-10. Dirección de Pages: [mercado-local-astudillo.pages.dev](https://mercado-local-astudillo.pages.dev/). La validación completa de recorridos en el alojamiento público queda pendiente.
+
+El sitio principal continúa en el VPS de Hostinger. SQLite conserva los datos de cada navegador y origen: las cuentas de localhost o de `pages.dev` no se trasladan al subdominio. La etiqueta `noindex` existente se conserva.
+
 ## Usar el proyecto
 
 Bun 1.4.2 y Node.js 22.12 o superior son las versiones de referencia de `package.json`. La revisión local se ejecutó con Bun 1.3.14 y Node.js 26.4.0.
@@ -49,7 +53,7 @@ Compilación correcta de las 28 páginas principales y 29 del comparador. **390 
 
 Se comprobaron 320/390/768/1024/1440 px, ajustes reales de texto al 200 % y zoom nativo al 400 % en Chromium, incluida una compra. Persistencia al recargar y al cerrar/reabrir el navegador, perfiles separados, diez cambios entre pestañas, precios históricos, confirmación idempotente y errores de almacenamiento. Capturas revisadas.
 
-Pendientes: Safari/iOS, lectores de pantalla y auditoría completa de accesibilidad. No se afirma conformidad WCAG completa. Publicación fuera de esta etapa.
+Pendientes: Safari/iOS, lectores de pantalla y auditoría completa de accesibilidad. No se afirma conformidad WCAG completa. La publicación posterior está registrada en D60 de PROYECTO.md.
 
 Informes, comandos de prueba, procedencia de identidad y gestión del comparador en [design/propuesta-local](./design/propuesta-local/README.md).
 

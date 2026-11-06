@@ -1,6 +1,6 @@
 # Mercado Local: idea, estructura y decisiones
 
-Última actualización: 2026-10-09.
+Última actualización: 2026-11-06.
 
 Las decisiones confirmadas describen la primera versión. Las cuatro opciones visuales están aprobadas; su integración se registra por separado. Historial y decisiones anteriores conservados en [PROYECTO-anterior.md](./design/propuesta-local/PROYECTO-anterior.md).
 
@@ -24,7 +24,7 @@ El catálogo inicial y sus imágenes son ilustrativos. Una explicación en «Sob
 | D36 / D44–D49 / D51 | Vitrina de comercios; orden productos y servicios, promociones, mejor calificados y nuevos. | Identidad de La Nueva Historia, fotografías contextualizadas, tarjetas completas, carrusel manual, DRY y utilidades Tailwind. No se reabre la composición aprobada. |
 | D17 / D41 / D42 | Comparación interactiva antes de cambios visuales; accesibilidad y usabilidad. | Esperar elección antes de integrar. WCAG 2.2 AA como objetivo, sin afirmar conformidad completa. |
 | D50 | Herramientas de accesibilidad. | Componente existente reutilizado; botón flotante B aprobado en D58. |
-| D52 | SQLite WebAssembly en el navegador; sin backend ni servicios externos. | Revisa D01, D28, D33 y D40. Cuentas, tiendas, ofertas, promociones, direcciones, carritos, favoritos, pedidos y valoraciones persistentes localmente. Publicación fuera del alcance. |
+| D52 | SQLite WebAssembly en el navegador; sin backend ni servicios externos. | Revisa D01, D28, D33 y D40. Cuentas, tiendas, ofertas, promociones, direcciones, carritos, favoritos, pedidos y valoraciones persistentes localmente. La exclusión inicial de publicación se revisa en D60. |
 | D53 | Registro con nombre, correo y contraseña; acceso, salida y restablecimiento directo. | Revisa D09 y D29. Sin administrador, correos ni códigos. Contraseña derivada con Web Crypto; cuentas propias de este navegador. |
 | D54 | Cuenta y gestión completa de una tienda local por usuario. | Revisa D11, D19, D27 y D31–D33. Crear y editar tienda, catálogo, promociones, modalidades, tarifas y pedidos sin aprobación. Cambios disponibles para el propietario. |
 | D55 | Compras locales completas y pasarela que aprueba al confirmar. | Revisa D08 y D23–D24. Sin datos bancarios ni cobros; Deuna, transferencia y efectivo conservan estado pendiente hasta confirmar su recepción. |
@@ -32,6 +32,7 @@ El catálogo inicial y sus imágenes son ilustrativos. Una explicación en «Sob
 | D57 | Tareas largas en páginas y detalles con URL propia. | Revisa D16. Modales reservados para acciones breves y lectura; navegación A confirmada en D58. |
 | D58 | Elección del comparador: navegación A, identidad B, catálogo A y accesibilidad B. | Páginas para recorridos principales; marca secundaria en cabecera y pie; tarjetas compactas en dos columnas desde 361 px; botón flotante de accesibilidad. Integración autorizada el 2026-10-09. |
 | D59 | Botón de accesibilidad sólo con el icono, sin texto visible. | Solicitud explícita del usuario el 2026-10-09. Conserva la ubicación flotante B, un área de 48 × 48 px y el nombre accesible «Accesibilidad». Aplicado al componente compartido del sitio y del comparador. |
+| D60 | Publicación estática en Cloudflare Pages mediante GitHub y el subdominio mercado.lanuevahistoria.tech. | Solicitada y realizada por el usuario con guía el 2026-10-10. Proyecto mercado-local-astudillo, repositorio exinoss/mercado-local-astudillo; dominio activo con SSL y portada funcionando confirmados mediante capturas. Dominio registrado y sitio principal en Hostinger conservados; el alcance de los datos sigue siendo local al navegador. |
 
 Estas decisiones derivan de las respuestas del usuario y del plan cuya implementación solicitó. La elección previa de mercado operativo y servidor dentro de Astro fue revisada explícitamente por el usuario: el alcance vigente es completo pero local al navegador.
 
@@ -48,7 +49,7 @@ Una compra desde el escaparate de la tienda propia permite recorrer los dos lado
 ## 4. Arquitectura y reglas funcionales
 
 - Astro genera páginas estáticas. SQLite y Web Crypto se ejecutan en un Worker del navegador; la interfaz usa un repositorio compartido y no ejecuta SQL.
-- Almacenamiento OPFS con opfs-sahpool; Web Locks coordina inicialización y operaciones entre pestañas, cerrando conexiones y pausando el VFS al terminar. No se exigen cabeceras COOP/COEP.
+- Almacenamiento OPFS con opfs-sahpool; Web Locks coordina inicialización y operaciones entre pestañas, cerrando conexiones y pausando el VFS al terminar. No se exigen cabeceras COOP/COEP. Si OPFS no está disponible (Firefox en navegación privada lanza SecurityError en getDirectory), la base se abre en memoria y se copia a IndexedDB tras cada cambio; los datos duran lo que la sesión privada.
 - Esquema versionado: cuentas y espacios de datos por propietario, con entidades locales en el espacio correspondiente. Transacciones para cambios y confirmaciones. Los perfiles se separan en la aplicación, sin afirmar seguridad de autenticación de servidor.
 - Nombre, correo único en este navegador y contraseña de al menos seis caracteres. Restablecimiento directo con correo y nueva contraseña. No se guardan contraseñas como texto.
 - Carritos del visitante persistentes y combinados al entrar, con máximo 99 unidades por oferta. El antiguo indicador de cuenta no se convierte en cuenta registrada.
@@ -105,7 +106,9 @@ Primera versión definida e integrada el 2026-10-09. D58 aplica navegación A, i
 
 **Servidores:** comparador Bun PID 32260, puerto 4336, detenido tras registrar la elección; proceso y puerto verificados en server.json. La revisión de producción usó una instancia propia en 4337, registrada y detenida al terminar. El servidor del usuario en 4321 se conserva. Inicio y gestión: bun run dev:background, dev:status, dev:logs y dev:stop.
 
-La definición de esta primera versión queda cerrada. Backend, sincronización, actividad comercial real y publicación quedan fuera del alcance vigente.
+La definición de esta primera versión queda cerrada. Backend, sincronización y actividad comercial real quedan fuera del alcance vigente. La publicación solicitada posteriormente se completa en D60.
+
+**Publicación del 2026-10-10:** [mercado.lanuevahistoria.tech](https://mercado.lanuevahistoria.tech/) y [mercado-local-astudillo.pages.dev](https://mercado-local-astudillo.pages.dev/). El usuario confirma dominio Active, SSL habilitado y carga de la portada en el subdominio tras errores 522 durante la activación; no se determinó la causa exacta. Estas evidencias confirman el despliegue y acceso, sin sustituir la validación completa de recorridos en el alojamiento público. Los datos de localhost, pages.dev y el subdominio pertenecen a orígenes distintos y no se trasladan automáticamente. La etiqueta noindex existente se conserva; no se ha solicitado cambiar la indexación.
 
 ## 8. Validación y gestión de servidores
 
@@ -146,3 +149,5 @@ El comparador usa puerto propio y SQLite con espacio proposal-review-v1, separad
 | 2026-10-09 | El usuario aprueba A/B/A/B: páginas, marca secundaria en cabecera y pie, catálogo compacto de dos columnas desde 361 px y accesibilidad flotante. Se registra D58 y se autoriza integrar los recorridos compartidos en la aplicación principal; las otras opciones se conservan como referencia. |
 | 2026-10-09 | Se integra D58 en 28 páginas estáticas: SQLite/OPFS y recorridos de comprador/comerciante activos, identidad B, catálogo A y accesibilidad B. Se retira el controlador anterior conservando referencias; catálogo inicial único y contenido revisado. 390 comprobaciones de integración y seis pruebas de lógica correctas; texto 200 % y zoom nativo 400 % en Chromium comprobados. Comparador 4336 detenido y artefacto conservado; revisión 4337 cerrada, instancia del usuario 4321 conservada. Safari/iOS, lectores de pantalla y auditoría completa pendientes; publicación fuera del alcance. |
 | 2026-10-09 | El usuario solicita el botón de accesibilidad sólo con icono (D59). Se reutiliza la opción B del artefacto y se aplica la indicación explícita al componente compartido, sin reabrir la elección. Compilación de 28 páginas correcta; icono sin texto y área de 48 × 48 px comprobados en Chromium a 320, 390, 768, 1024 y 1440 px. Lectura al 200 %, apertura con teclado, cierre con Escape y devolución del foco correctos. Servidor temporal de revisión 4338 detenido y puerto cerrado. |
+| 2026-10-10 | El usuario publica desde GitHub en Cloudflare Pages y activa mercado.lanuevahistoria.tech mediante CNAME, conservando su sitio principal en el VPS y el registro del dominio en Hostinger. Se registra D60, revisando la exclusión anterior de publicación. Tras errores 522, las capturas confirman dominio Active con SSL y portada funcionando en el subdominio; causa exacta no determinada. Documentación actualizada; almacenamiento local e indexación sin cambios. |
+| 2026-11-06 | Corregido el error «Security error when calling GetDirectory» de Firefox en navegación privada: el Worker usa SQLite en memoria con copia en IndexedDB cuando OPFS está bloqueado. Comprobado con Playwright Firefox en modo privado y normal: sin aviso de almacenamiento y carrito conservado al cambiar de página. Servidor temporal 4399 detenido. |
