@@ -7,7 +7,6 @@ Publicado en [mercado.lanuevahistoria.tech](https://mercado.lanuevahistoria.tech
 
 El sitio principal continúa en el VPS de Hostinger. SQLite conserva los datos de cada navegador y origen: las cuentas de localhost o de `pages.dev` no se trasladan al subdominio. La etiqueta `noindex` existente se conserva.
 
-## Usar el proyecto
 **Alcance de esta publicación:** cuentas, tiendas, carritos y pedidos guardados únicamente en
 el navegador mediante SQLite WASM/OPFS. No hay sincronización, autenticación de servidor ni
 cobros reales. El catálogo y sus fotografías iniciales son ilustrativos. Restablecer la contraseña
@@ -77,25 +76,6 @@ GitHub Actions instala con lockfile congelado, audita dependencias, prueba y com
 `dist/` como artefacto, sin desplegar. El alojamiento lo decide el responsable de la publicación.
 Los archivos nuevos necesarios deben incluirse en el primer commit junto con los modificados.
 
-Compilación correcta de las 28 páginas principales y 29 del comparador. **390 comprobaciones de integración correctas**: Chromium, Firefox, edición de comercio, teclado/contraste, migración, desarrollo y adaptación. **Seis pruebas de lógica con 30 aserciones**.
-
-Se comprobaron 320/390/768/1024/1440 px, ajustes reales de texto al 200 % y zoom nativo al 400 % en Chromium, incluida una compra. Persistencia al recargar y al cerrar/reabrir el navegador, perfiles separados, diez cambios entre pestañas, precios históricos, confirmación idempotente y errores de almacenamiento. Capturas revisadas.
-
-Pendientes: Safari/iOS, lectores de pantalla y auditoría completa de accesibilidad. No se afirma conformidad WCAG completa. La publicación posterior está registrada en D60 de PROYECTO.md.
-
-Informes, comandos de prueba, procedencia de identidad y gestión del comparador en [design/propuesta-local](./design/propuesta-local/README.md).
-
-## Documentación y referencias
-
-- [Propósito, alcance, decisiones y estado real](./PROYECTO.md)
-- [Comparador aprobado A/B/A/B y verificaciones](./design/propuesta-local/README.md)
-- [Identidad C: Vitrina de comercios](./design/identidad-carrusel/README.md)
-- [Procedencia de fotografías contextualizadas](./design/identidad-carrusel/IMAGENES.md)
-- [Renovación de portada y comercios](./design/rediseno/IMAGENES.md)
-- [Migración previa a Tailwind](./design/tailwind-migration/README.md)
-- [SQLite: persistencia en navegador](https://sqlite.org/wasm/doc/trunk/persistence.md)
-- [Rutas Astro](https://docs.astro.build/en/guides/routing/)
-- [Estilos Astro](https://docs.astro.build/en/guides/styling/)
 Persistencia en [SQLite WASM](https://sqlite.org/wasm/doc/trunk/persistence.md).
 Pendientes de validación: Safari/iOS, lectores de pantalla y dispositivos físicos.
 No se afirma conformidad completa con WCAG.
