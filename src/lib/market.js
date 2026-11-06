@@ -19,7 +19,14 @@ export function rating(shop, ratings = {}) {
   return { score: reviews ? ((shop.rating || 0) * baseCount + (score || 0)) / reviews : 0, reviews };
 }
 
+export function isCalendarDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0,10) === value;
+}
+
 export function isNewShop(shop, now = new Date()) {
+  if (!isCalendarDate(shop.startedAt)) return false;
   const start = new Date(`${shop.startedAt}T00:00:00Z`);
   if (!Number.isFinite(start.getTime())) return false;
   const until = new Date(start);

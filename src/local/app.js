@@ -1,3 +1,6 @@
+import './market-controls.js';
+import './logo-motion.js';
+import {initializePageNavigation} from './page-navigation.js';
 import { createRepository } from './repository.js';
 import { initialState, catalog, dollars } from './catalog.js';
 import { cartItems } from './transitions.js';
@@ -14,14 +17,14 @@ const variants = comparison ? variantsFrom(location.search) : approvedVariants;
 const views = createViews(variants, comparison), params = new URLSearchParams(location.search);
 const path = location.pathname.endsWith('/') ? location.pathname : location.pathname + '/';
 const main = document.querySelector('#main'), status = document.querySelector('#feedback');
-let state = initialState(), slide = 0, ready = false, feedbackTimer, storageProblem = '';
-function say(message) { status.textContent = message; status.hidden = false; clearTimeout(feedbackTimer); feedbackTimer = setTimeout(() => status.hidden = true, 6000); }
+let state = initialState(), ready = false, feedbackTimer, storageProblem = '';
+function say(message) { const modalStatus=document.querySelector('#quick-dialog[open] [data-offer-feedback]');if(modalStatus){modalStatus.textContent=message;modalStatus.hidden=false;return;}status.textContent = message; status.hidden = false; clearTimeout(feedbackTimer); feedbackTimer = setTimeout(() => status.hidden = true, 6000); }
 function safeNext(value) { if (!value || !value.startsWith('/') || value.startsWith('//')) return '/cuenta/'; const url = new URL(value,location.origin); return url.origin === location.origin ? url.pathname + url.search : '/cuenta/'; }
 function go(destination, values = {}) { location.href = views.h(destination,values); }
 function badges() { document.querySelectorAll('[data-cart-count]').forEach(badge => badge.textContent = Object.values(state.carts).reduce((sum,cart)=>sum+Object.values(cart).reduce((a,b)=>a+b,0),0)); const label = document.querySelector('[data-account-label]'); if(label) label.textContent = repository.account ? 'Mi cuenta' : 'Entrar'; const accountLink = label?.closest('a'); if(accountLink) accountLink.href = views.h(repository.account ? '/cuenta/' : '/acceso/'); }
-function selectSlide(index) { slide = (index + 3) % 3; document.querySelectorAll('[data-slide]').forEach(item => item.hidden = Number(item.dataset.slide) !== slide); document.querySelectorAll('[data-slide-select]').forEach(item => item.setAttribute('aria-pressed',String(Number(item.dataset.slideSelect) === slide))); const position = document.querySelector('#slide-position'); if (position) position.textContent = `${slide + 1} / 3`; }
+
 function enableLocalForms(container) { container.querySelectorAll('[data-local-fields]').forEach(fields => fields.disabled = false); }
-function render() { main.innerHTML = views.page(path,params,state,repository.account); enableLocalForms(main); badges(); updateCheckout(); restoreContext(); selectSlide(slide); const title = main.querySelector('h1')?.textContent; if (title && path !== '/') document.title = `${title} | Mercado Local`; }
+function render() { main.innerHTML = views.page(path,params,state,repository.account); enableLocalForms(main); badges(); updateCheckout(); restoreContext(); const title = main.querySelector('h1')?.textContent; if (title && path !== '/') document.title = `${title} | Mercado Local`; }
 function restoreActionFocus(origin) { const attributes = ['data-add','data-favorite','data-quantity','data-receive','data-paid','data-order-status']; for (const name of attributes) if (origin.hasAttribute(name)) { const candidate = [...document.querySelectorAll(`button[${name}]`)].find(button => button.getAttribute(name) === origin.getAttribute(name) && (!origin.hasAttribute('data-status') || button.dataset.status === origin.dataset.status)); if (candidate) { candidate.focus(); return; } } main.querySelector('h1')?.focus({preventScroll:true}); }
 async function refresh(renderPage = true) { const result = await repository.read(); state = result.state; if(renderPage)render(); else badges(); return result; }
 function updateCheckout() {
@@ -59,7 +62,24 @@ async function fileImage(form, data) {
   const bitmap = await createImageBitmap(file); const ratio = Math.min(1,1200/Math.max(bitmap.width,bitmap.height)); const canvas = document.createElement('canvas'); canvas.width = Math.round(bitmap.width*ratio); canvas.height = Math.round(bitmap.height*ratio); canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height); bitmap.close(); data.image = canvas.toDataURL('image/webp',0.82);
 }
 const quick = document.querySelector('#quick-dialog'), quickModal = quick ? manageDialog(quick) : null, confirm = document.querySelector('#confirm-dialog'), confirmModal = manageDialog(confirm);
-let confirmAction;
+let confirmAction,selectedOfferId,ownsModalHistory=false;
+function showOffer(id,record=true,providerId=id){
+  const offer=catalog(state).offers.find(item=>item.id===id);if(!offer){say('Esta oferta ya no está disponible.');return;}
+  const wasOpen=quick.open;selectedOfferId=id;
+  quick.querySelector('[data-offer-feedback]').hidden=true;
+  quick.querySelector('#quick-content').innerHTML=views.detail(offer,state,'h2',providerId);enableLocalForms(quick);
+  if(record&&!wasOpen){const url=new URL(location.href);url.searchParams.set('oferta',id);history.pushState({marketOffer:id},'',url);ownsModalHistory=true;}
+  quickModal.open();
+}
+quick.addEventListener('close',()=>{
+  if(ownsModalHistory){ownsModalHistory=false;history.back();}
+  else{const url=new URL(location.href);if(url.searchParams.has('oferta')){url.searchParams.delete('oferta');history.replaceState(null,'',url);}else if(path==='/oferta/')history.replaceState(null,'',views.h('/catalogo/'));}
+});
+window.addEventListener('popstate',event=>{
+  const id=new URLSearchParams(location.search).get('oferta');ownsModalHistory=!!event.state?.marketOffer;
+  if(id)showOffer(id,false);else if(quick.open){ownsModalHistory=false;quick.close();}
+});
+function updateServiceFields(){const form=document.querySelector('[data-form=offer]'),fields=form?.querySelector('[data-service-fields]');if(fields){const service=form.elements.kind.value==='Servicio';fields.hidden=!service;form.elements.trade.required=service;}}
 document.addEventListener('submit',async event => {
   const form = event.target.closest('[data-form]'); if (!form) return;
   event.preventDefault(); if(!ready) { const error = form.querySelector('.form-error'); error.textContent = storageProblem || 'Espera a que se abra el almacenamiento local.'; error.hidden = false; error.focus(); return; } if(!form.reportValidity())return;
@@ -74,12 +94,13 @@ document.addEventListener('submit',async event => {
       if (action === 'shop') { data.deliveryModes = fields.getAll('deliveryModes'); await fileImage(form,data); }
       if (action === 'offer') { data.available = fields.has('available'); await fileImage(form,data); }
       await repository.mutate(action,data);
-      if (action === 'shop' || action === 'offer')go('/panel/'); else { if(quick?.open)quick.close(); await refresh(); say(action === 'add' ? 'Oferta añadida al carrito de esta tienda.' : 'Cambios guardados.'); }
+      if (action === 'shop' || action === 'offer')go('/panel/'); else { await refresh(!quick.open); say(action === 'add' ? 'Oferta añadida al carrito de esta tienda.' : 'Cambios guardados.'); }
     }
   } catch (failure) { error.textContent=failure.message;error.hidden=false;error.focus(); }
   finally { submit.disabled=false; }
 });
 document.addEventListener('change',event=> {
+  if(event.target.name==='kind')updateServiceFields();
   if(event.target.name === 'saved-address') { const address=state.addresses.find(item=>item.id===event.target.value);const form=event.target.form;if(address){form.elements.address.value=address.address;form.elements.zone.value=address.zone;} }
   const form = event.target.closest('[data-form="draft"]');
   if(form) { updateCheckout(); void saveCheckout(form); }
@@ -87,14 +108,17 @@ document.addEventListener('change',event=> {
 document.addEventListener('input', event => { const form = event.target.closest('[data-form="draft"]'); if(form) void saveCheckout(form); });
 document.addEventListener('click',async event=> {
   const target = event.target.closest('a,button'); if(!target)return;
+  if(target.hasAttribute('data-service-provider')){showOffer(selectedOfferId,false,target.dataset.serviceProvider);quick.querySelector('#professional-name')?.focus({preventScroll:true});return;}
+  if(target.tagName==='A'&&!event.defaultPrevented&&event.button===0&&!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey&&!target.hasAttribute('download')&&(!target.target||target.target==='_self')){
+    const url=new URL(target.href,location.href);if(url.origin===location.origin&&url.pathname==='/oferta/'&&url.searchParams.get('id')){event.preventDefault();showOffer(url.searchParams.get('id'));return;}
+  }
   if(target.hasAttribute('data-context'))try{sessionStorage.setItem('market-local-return',JSON.stringify({path:location.pathname+location.search,scroll:scrollY}));}catch{}
   if(target.hasAttribute('data-back')) { try { const context=JSON.parse(sessionStorage.getItem('market-local-return')||'null');if(context?.path?.startsWith('/')&&!context.path.startsWith('//'))target.href=context.path; } catch{} }
   if(target.hasAttribute('data-logout')) { repository.logout();go('/');return; }
   if(target.hasAttribute('data-quick-close')) { quick.close();return; }
   if(target.hasAttribute('data-confirm-close')) { confirm.close();return; }
   if(target.hasAttribute('data-confirm-yes')) { confirm.close();if(confirmAction)await perform(confirmAction.action,confirmAction.payload);return; }
-  if(target.dataset.slideStep || target.dataset.slideSelect != null) { selectSlide(target.dataset.slideSelect != null ? Number(target.dataset.slideSelect) : slide + Number(target.dataset.slideStep));return; }
-  if(target.dataset.quick && quick) { const offer=catalog(state).offers.find(item=>item.id===target.dataset.quick);const area=quick.querySelector('#quick-content');area.innerHTML=views.detail(offer,state);enableLocalForms(area);area.querySelector('h1').id='quick-title';quickModal.open();return; }
+  if(target.dataset.quick) { event.preventDefault();showOffer(target.dataset.quick);return; }
   if(target.dataset.favorite && !repository.account) { go('/acceso/',{next:location.pathname+location.search,favorite:target.dataset.favorite});return; }
   if(!ready && [...target.attributes].some(attr=>/^data-(add|favorite|quantity|remove|confirm|receive|paid|delete)/.test(attr.name))) {say('No se pudo abrir el almacenamiento. Recarga la página o permite guardar datos en este navegador.');return;}
   let action,payload;
@@ -109,23 +133,24 @@ document.addEventListener('click',async event=> {
   if(target.dataset.deleteOffer){confirmAction={action:'delete-offer',payload:{id:target.dataset.deleteOffer}};confirmModal.open();return;}
   if(target.dataset.confirm){
     if(target.disabled)return;target.disabled=true;
-    try{const shop=target.dataset.confirm;await refresh(false);const draft=state.drafts[shop];if(!draft)throw new Error('Este pedido ya se confirmó o necesita completar sus datos.');await repository.mutate('order',draft);go('/pedido/',{id:draft.id});}catch(error){say(error.message);target.disabled=false;}return;
+    try{const draft=JSON.parse(target.dataset.confirmPayload || 'null');if(!draft)throw new Error('Este pedido ya se confirmó o necesita completar sus datos.');await repository.mutate('order',draft);go('/pedido/',{id:draft.id});}catch(error){say(error.message);target.disabled=false;}return;
   }
   if(action){target.disabled=true;try{await perform(action,payload);target.disabled=false;restoreActionFocus(target);}finally{target.disabled=false;}}
 });
-document.addEventListener('keydown', event => { if (!event.target.closest('[data-slide-select]') || !['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return; event.preventDefault(); selectSlide(event.key === 'Home' ? 0 : event.key === 'End' ? 2 : slide + (event.key === 'ArrowRight' ? 1 : -1)); document.querySelector(`[data-slide-select="${slide}"]`)?.focus(); });
 async function perform(action,payload){try{await repository.mutate(action,payload);await refresh();say(action==='add'?'Oferta añadida al carrito de esta tienda.':'Cambios guardados.');}catch(error){say(error.message);}}
-window.addEventListener('resize',()=>{if(innerWidth<901&&quick?.open)quick.close();});
 async function start(){
   try{await repository.migrateLegacy();await refresh(false);await recoverPendingDraft();ready=true;}catch(error){storageProblem=error.message;document.querySelector('#storage-error').hidden=false;document.querySelector('#storage-error').textContent=error.message;}
-  if(ready&&protectedPaths.includes(path)&&!repository.account){go('/acceso/',{next:location.pathname+location.search});return;}
+  if(protectedPaths.includes(path)&&(!ready||!repository.account)){location.replace(views.h('/acceso/',{next:location.pathname+location.search}));return;}
   document.querySelector('#local-header').innerHTML=views.header(state,repository.account);document.querySelector('#local-footer').innerHTML=views.footer();render();
   const controls=readingControls(variants.access);if(variants.access==='A')document.querySelector('#reading-slot').innerHTML=controls.trigger;else document.querySelector('#reading-controls').innerHTML=controls.trigger;
   document.querySelector('#reading-dialog').innerHTML=controls.dialog;await import('../scripts/accessibility.js');
   document.querySelectorAll('dialog').forEach(containDialogFocus);
   document.documentElement.classList.remove('no-js');document.body.dataset.ready='true';
+  updateServiceFields();
+  const initialOffer=params.get('oferta')||(path==='/oferta/'?params.get('id'):null);if(initialOffer)showOffer(initialOffer,false);
   repository.onChange(async()=>{try{const editing=!!document.activeElement?.closest('form');await refresh(!editing);if(editing)say('Los datos de tu cuenta se actualizaron en otra pestaña.');}catch(error){say(error.message);}});
   // Shared repository exposed for the browser regression suite; no SQL or server API.
   window.marketLocal={repository,get state(){return state;},refresh,variants};
 }
+initializePageNavigation();
 start().catch(error=>say(error.message));

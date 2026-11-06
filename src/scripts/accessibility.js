@@ -45,6 +45,7 @@ if (dialog && trigger) {
     event.preventDefault();
     settings = { ...defaultReadingSettings };
     save();
+    window.dispatchEvent(new Event('market-motion-reset'));
   });
   trigger.hidden = false;
   apply();

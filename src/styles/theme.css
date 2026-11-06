@@ -1,23 +1,25 @@
 @theme {
-  --font-sans: 'DM Sans', Arial, sans-serif;
-  --font-heading: 'Barlow Condensed', Arial, sans-serif;
-  --color-brand: #063176;
-  --color-ink: #00132e;
-  --color-highlight: #f9c31b;
-  --color-accent: #e0121f;
-  --color-danger: #b80e18;
-  --color-muted: #52647c;
-  --color-line: #cad5e3;
-  --color-control: #6b7c93;
-  --color-soft: #eaf0f8;
-  --color-page: #feffff;
-  --color-photo: #dae5f2;
-  --color-card: #b8c7da;
-  --color-promotion: #fffbe8;
-  --color-rating: #815500;
-  --color-favorite: #fff1f3;
-  --shadow-offer: 0 3px 0 #0631760c;
-  --shadow-reading: 0 3px 12px #00132e30;
+  --font-sans:'DM Sans',Arial,sans-serif;
+  --font-heading:'Barlow Condensed',Arial,sans-serif;
+  --shadow-reading:0 3px 12px #00132e30;
+  --color-brand:#063176;
+  --color-highlight:#FFC20E;
+  --color-highlight-secondary:#FAC813;
+  --background-image-market-page:linear-gradient(to bottom,var(--color-highlight-secondary),color-mix(in srgb,var(--color-highlight-secondary) var(--market-wash-middle,72%),transparent) 42%,transparent 100%);
+  --color-accent:#E0121F;
+  --color-danger:#E0121F;
+  --color-ink:#00132E;
+  --color-page:#FFFFFF;
+  --color-muted:color-mix(in srgb, #00132E 78%, #FFFFFF);
+  --color-line:color-mix(in srgb, #063176 22%, #FFFFFF);
+  --color-control:color-mix(in srgb, #063176 65%, #FFFFFF);
+  --color-card:color-mix(in srgb, #063176 55%, #FFFFFF);
+  --color-soft:color-mix(in srgb, #063176 5%, #FFFFFF);
+  --color-photo:color-mix(in srgb, #063176 8%, #FFFFFF);
+  --color-promotion:color-mix(in srgb, #FFC20E 10%, #FFFFFF);
+  --color-rating:#063176;
+  --color-favorite:color-mix(in srgb, #E0121F 5%, #FFFFFF);
+  --shadow-offer:0 2px 5px #0631760d;
 }
 
 @font-face { font-family:'DM Sans'; font-style:normal; font-weight:400; font-display:swap; src:url('/fonts/dm-400.woff2') format('woff2'); }

@@ -36,3 +36,175 @@ export const heroSlides = [
   { offerId:'telefono', title:'Tecnología que llega a tu barrio.', theme:'Nuevos productos', label:'Novedad del catálogo', description:'Teléfono 5G de 128 GB de Tecno San Lorenzo. Descubre el producto y las opciones de retiro o entrega.', alt:'Teléfono 5G sobre el mostrador de una tienda, imagen ilustrativa', action:'Conocer el producto' },
   { offerId:'revision', title:'Conoce a quienes están empezando.', theme:'Negocios nuevos', label:'Nuevo comercio', description:'Taller Digital se suma a la plaza con revisión de equipos. Dale una oportunidad a un emprendimiento local.', alt:'Espacio de reparación de equipos, imagen ilustrativa', action:'Explorar Taller Digital', linkToShop:true }
 ];
+
+// Entradas ilustrativas de la propuesta elegida (D73).
+shops.push(...[
+  {
+    "id": "sabores-del-puerto",
+    "slug": "sabores-del-puerto",
+    "name": "Sabores del Puerto",
+    "category": "Comida",
+    "image": "mercado/comida.webp",
+    "description": "Frutas y alimentos para llevar a tu mesa.",
+    "startedAt": "2026-10-01",
+    "address": "Zona urbana de San Lorenzo",
+    "hours": "Lunes a sábado, 08:00–18:00",
+    "contact": "",
+    "delivery": "Retiro y entrega a domicilio",
+    "deliveryModes": [
+      "retiro",
+      "entrega"
+    ],
+    "deliveryFees": {
+      "centro": 1.5,
+      "urbana": 2.5
+    }
+  },
+  {
+    "id": "manos-de-san-lorenzo",
+    "slug": "manos-de-san-lorenzo",
+    "name": "Manos de San Lorenzo",
+    "category": "Hogar",
+    "image": "mercado/hogar.webp",
+    "description": "Detalles y artículos para los espacios de tu hogar.",
+    "startedAt": "2026-10-01",
+    "address": "Zona urbana de San Lorenzo",
+    "hours": "Lunes a sábado, 08:00–18:00",
+    "contact": "",
+    "delivery": "Retiro y entrega a domicilio",
+    "deliveryModes": [
+      "retiro",
+      "entrega"
+    ],
+    "deliveryFees": {
+      "centro": 1.5,
+      "urbana": 2.5
+    }
+  },
+  {
+    "id": "albanileria-local",
+    "slug": "albanileria-local",
+    "name": "Albañilería local",
+    "category": "Hogar",
+    "image": "",
+    "description": "Atención de albañilería para tu hogar.",
+    "startedAt": "2022-01-01",
+    "address": "Zona urbana de San Lorenzo",
+    "hours": "Consulta disponibilidad antes de contratar",
+    "contact": "",
+    "delivery": "Servicio a domicilio",
+    "deliveryModes": [
+      "retiro"
+    ],
+    "deliveryFees": {
+      "centro": 1.5,
+      "urbana": 2.5
+    },
+    "trade": "Albañilería",
+    "icon": "tools"
+  },
+  {
+    "id": "plomeria-local",
+    "slug": "plomeria-local",
+    "name": "Plomería local",
+    "category": "Hogar",
+    "image": "",
+    "description": "Atención de plomería para tu hogar.",
+    "startedAt": "2022-01-01",
+    "address": "Zona urbana de San Lorenzo",
+    "hours": "Consulta disponibilidad antes de contratar",
+    "contact": "",
+    "delivery": "Servicio a domicilio",
+    "deliveryModes": [
+      "retiro"
+    ],
+    "deliveryFees": {
+      "centro": 1.5,
+      "urbana": 2.5
+    },
+    "trade": "Plomería",
+    "icon": "water"
+  },
+  {
+    "id": "electricidad-local",
+    "slug": "electricidad-local",
+    "name": "Electricidad local",
+    "category": "Hogar",
+    "image": "",
+    "description": "Atención de electricidad para tu hogar.",
+    "startedAt": "2022-01-01",
+    "address": "Zona urbana de San Lorenzo",
+    "hours": "Consulta disponibilidad antes de contratar",
+    "contact": "",
+    "delivery": "Servicio a domicilio",
+    "deliveryModes": [
+      "retiro"
+    ],
+    "deliveryFees": {
+      "centro": 1.5,
+      "urbana": 2.5
+    },
+    "trade": "Electricidad",
+    "icon": "bolt"
+  }
+]);
+offers.push(...[
+  {
+    "id": "cesta-temporada",
+    "shop": "sabores-del-puerto",
+    "name": "Cesta de temporada",
+    "category": "Comida",
+    "price": 10,
+    "image": "contexto/canasta.webp",
+    "kind": "Producto",
+    "description": "Una selección de alimentos de temporada. Consulta el contenido en la tienda.",
+    "available": true
+  },
+  {
+    "id": "detalle-hogar",
+    "shop": "manos-de-san-lorenzo",
+    "name": "Escritorio compacto",
+    "category": "Hogar",
+    "price": 110,
+    "image": "products/escritorio.jpg",
+    "kind": "Producto",
+    "description": "Un escritorio para tu espacio de trabajo en casa.",
+    "available": true
+  },
+  {
+    "id": "visita-albanil",
+    "shop": "albanileria-local",
+    "name": "Visita de albañilería",
+    "price": 12,
+    "icon": "tools",
+    "trade": "Albañilería",
+    "kind": "Servicio",
+    "category": "Hogar",
+    "available": true,
+    "description": "Precio fijo por la visita de revisión. Materiales y trabajos adicionales se acuerdan por separado con el proveedor."
+  },
+  {
+    "id": "visita-plomero",
+    "shop": "plomeria-local",
+    "name": "Revisión de una fuga",
+    "price": 15,
+    "icon": "water",
+    "trade": "Plomería",
+    "kind": "Servicio",
+    "category": "Hogar",
+    "available": true,
+    "description": "Precio fijo por la visita de revisión. Materiales y trabajos adicionales se acuerdan por separado con el proveedor."
+  },
+  {
+    "id": "visita-electricista",
+    "shop": "electricidad-local",
+    "name": "Revisión de un punto eléctrico",
+    "price": 18,
+    "icon": "bolt",
+    "trade": "Electricidad",
+    "kind": "Servicio",
+    "category": "Hogar",
+    "available": true,
+    "description": "Precio fijo por la visita de revisión. Materiales y trabajos adicionales se acuerdan por separado con el proveedor."
+  }
+]);

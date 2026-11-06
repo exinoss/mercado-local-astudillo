@@ -1,5 +1,6 @@
 @import "../styles/global.css";
 @layer components {
+  .market-brand-symbol { @apply grid h-20 w-15 shrink-0 place-items-center; }
   .local-form { @apply max-w-[720px]; }
   .local-form label { @apply min-w-0; }
   .local-form input[type=checkbox] { @apply size-5 min-h-5 shrink-0; }
@@ -7,5 +8,223 @@
   .prose-copy { @apply max-w-[70ch]; }
   .prose-copy h2 { @apply mt-7 mb-3 text-2xl; }
   .prose-copy p { @apply mb-4; }
-  .slide-tab[aria-pressed=true] { @apply bg-brand text-white shadow-[inset_0_-3px_0_var(--color-highlight)]; }
 }
+
+@layer components {
+  body { @apply isolate; }
+  body::before { content:""; @apply pointer-events-none fixed inset-x-0 top-0 -z-1 bg-market-page; height:var(--market-wash-height,100vh); }
+  #main { @apply flow-root; }
+  .market-header { @apply border-b-[3px] border-accent bg-highlight text-ink; }
+  .market-header svg { @apply size-6.5; }
+  .market-brand-symbol svg { @apply size-full; }
+  .header-top { @apply grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-4 py-4 min-[1100px]:grid-cols-[auto_1fr_auto_auto] min-[1100px]:gap-x-6; }
+  .market-brand { @apply col-start-1 row-start-1 inline-flex min-w-0 items-center gap-2 no-underline min-[390px]:gap-3; }
+  .market-brand strong { @apply block font-heading text-[2.125rem] leading-none min-[601px]:text-[2.5rem]; }
+  .market-brand>span:last-child { @apply min-w-0; }
+  .market-brand small { @apply mt-1.5 block text-base leading-normal font-medium; }
+  .market-search { @apply col-span-2 col-start-1 row-start-2 flex min-w-0 overflow-visible rounded-lg border border-brand bg-white min-[1100px]:col-span-1 min-[1100px]:col-start-2 min-[1100px]:row-start-1; }
+  .market-search:focus-within { @apply outline-3 outline-offset-3 outline-brand shadow-[0_0_0_5px_white]; }
+  .market-search input { @apply min-h-14 w-0 min-w-0 flex-1 rounded-l-lg border-0 bg-transparent px-3 text-lg text-ink outline-none shadow-none; }
+  .market-search input:focus-visible { @apply outline-none shadow-none; }
+  .market-search button { @apply grid min-h-14 w-14 shrink-0 place-items-center rounded-r-lg border-0 border-l border-brand/20 bg-white text-brand; }
+  .header-account { @apply col-span-2 col-start-1 row-start-3 grid grid-cols-2 items-stretch gap-3 min-[700px]:flex min-[700px]:justify-end min-[1100px]:col-span-1 min-[1100px]:col-start-3 min-[1100px]:row-start-1; }
+  .header-account:has([data-header-account]) { @apply grid-cols-1; }
+  .account-create,.account-button { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-brand px-3 py-2 text-base font-bold no-underline; }
+  .account-create { @apply bg-brand text-white; }
+  .account-button { @apply bg-transparent text-brand; }
+  .header-cart { @apply col-start-2 row-start-1 inline-flex min-h-14 min-w-14 items-center justify-center gap-1 rounded-md text-brand no-underline min-[1100px]:col-start-4; }
+  .header-cart span { @apply grid min-h-7 min-w-7 place-items-center rounded-full bg-brand px-1 text-base font-bold text-white; }
+  .header-lower { @apply flex flex-wrap items-center justify-between gap-x-5 border-t border-brand/20 py-1; }
+  .header-lower nav { @apply flex flex-wrap gap-x-5; }
+  .header-lower nav a { @apply inline-flex min-h-12 items-center text-base font-medium no-underline hover:underline; }
+  .header-lower p { @apply pb-3 text-base min-[1100px]:pb-0; }
+  .image-carousel { @apply relative w-full; --market-banner-fade:linear-gradient(to bottom,#000 0%,#000 76%,transparent 100%); }
+  .carousel-images { @apply relative overflow-hidden; mask-image:var(--market-banner-fade); }
+  .banner-link { @apply block; }
+  .banner-link img { @apply aspect-[1440/480] w-full object-cover max-[600px]:aspect-[600/660]; }
+  .carousel-images[data-sized] [data-hero-slide],.carousel-images[data-sized] .banner-link,.carousel-images[data-sized] picture { @apply block h-full; }
+  .carousel-images[data-sized] [data-hero-slide][hidden] { @apply hidden; }
+  .carousel-images[data-sized] .banner-link { @apply bg-highlight; }
+  .carousel-images[data-sized] .banner-link img { @apply h-full aspect-auto object-contain; }
+  .banner-link:focus-visible { @apply relative z-2 -outline-offset-8; }
+  .carousel-arrow { @apply absolute z-2 grid size-16 -translate-y-1/2 place-items-center rounded-full border border-brand/30 bg-white text-brand shadow-offer min-[601px]:size-18; top:var(--carousel-arrow-top,50%); }
+  .carousel-arrow svg { @apply size-8 min-[601px]:size-9; }
+  .carousel-arrow.previous { @apply left-2 min-[768px]:left-5; }
+  .carousel-arrow.next { @apply right-2 min-[768px]:right-5; }
+  .carousel-controls { @apply relative z-2 flex min-h-14 flex-wrap items-center justify-center gap-2 px-3 pb-3 text-sm min-[601px]:absolute min-[601px]:inset-x-0 min-[601px]:bottom-4 min-[601px]:pb-0; }
+  [data-hero-position] { @apply min-w-[4em] rounded-full bg-white px-2 py-1 text-center tabular-nums; }
+  .carousel-dots { @apply flex max-w-full flex-wrap items-center justify-center rounded-full bg-white/95 px-1; }
+  .carousel-dots button { @apply grid size-11 min-w-11 place-items-center rounded-full; }
+  .carousel-dots span { @apply size-2.5 rounded-full border border-brand bg-white; }
+  .carousel-dots [aria-pressed=true] span { @apply w-6 bg-brand; }
+  [data-animated-logo] { @apply relative; }
+  [data-animated-logo]>img,.json-logo-player { @apply absolute inset-0 size-full; }
+  [data-animated-logo]>img { @apply object-contain; }
+  .json-logo-player svg { @apply block size-full; }
+  .carousel-images:has([data-logo-hero]:not([hidden])) { mask-image:none; }
+  .logo-hero { @apply relative pb-6 min-[601px]:pb-12; }
+  .logo-hero::before { content:""; @apply pointer-events-none absolute inset-0 bg-highlight; mask-image:var(--market-banner-fade); }
+  .logo-hero-layout { @apply relative grid items-center gap-5 px-6 py-7 min-[601px]:min-h-[480px] min-[601px]:grid-cols-[1.5fr_1fr] min-[601px]:gap-10 min-[601px]:px-16 min-[1100px]:px-20; }
+  .logo-hero-copy { @apply min-w-0; }
+  .logo-hero-copy h2 { @apply max-w-[20ch] text-balance font-heading text-[2.5rem] leading-[1.05] font-bold text-brand min-[601px]:text-[3.5rem] min-[1100px]:text-[4.75rem]; }
+  .logo-hero-copy p { @apply mt-4 max-w-[46ch] text-lg leading-relaxed text-brand min-[1100px]:text-xl; }
+  .logo-hero-copy .button { @apply mt-5 min-h-12 max-w-full text-center text-base min-[601px]:text-lg; }
+  .logo-hero-art { @apply flex min-w-0 flex-col items-center gap-2; }
+  .hero-animated-logo { @apply block h-[180px] w-[150px] min-[601px]:h-[288px] min-[601px]:w-[240px] min-[1100px]:h-[336px] min-[1100px]:w-[280px]; }
+  [data-text-size="200"] .logo-hero-layout { @apply grid-cols-1 px-[12px] min-[601px]:px-[24px]; }
+  [data-text-size="200"] .logo-hero-copy h2 { @apply text-[2.5rem]; }
+  [data-text-size="200"] .hero-animated-logo { @apply max-w-full; }
+  [data-text-size="200"] .logo-hero-copy .button { @apply px-[8px]; }
+  .category-panel { @apply relative z-3 grid gap-5 rounded-xl border border-line bg-white p-5 shadow-offer min-[768px]:-mt-2 min-[1100px]:grid-cols-[210px_1fr] min-[1100px]:items-center min-[1100px]:p-6; }
+  .category-panel h2 { @apply text-2xl; }
+  .category-panel p { @apply mt-2 text-sm text-muted; }
+  .category-links { @apply grid grid-cols-3 gap-2 min-[601px]:grid-cols-5; }
+  .category-links a { @apply flex min-h-20 flex-col items-center justify-center gap-2 rounded-lg border border-transparent px-1 py-2 text-center text-sm font-bold text-brand no-underline hover:border-brand hover:bg-soft; }
+  .category-links a span { @apply grid size-11 place-items-center rounded-full bg-highlight/30; }
+  .category-links svg { @apply size-6; }
+  .home-section { @apply py-9 min-[768px]:py-12; }
+  .section-title { @apply mb-6 flex flex-wrap items-end justify-between gap-4; }
+  .section-title h2 { @apply text-[2rem] min-[768px]:text-[2.5rem]; }
+  .section-title p { @apply mt-2 max-w-[65ch] text-muted; }
+  .section-link { @apply inline-flex min-h-11 items-center text-sm font-bold text-brand underline underline-offset-4; }
+  .ventures-grid { @apply grid gap-4 min-[601px]:grid-cols-2 min-[1100px]:grid-cols-4; }
+  .venture-card { @apply flex min-w-0 flex-col overflow-hidden rounded-lg border border-card bg-white; }
+  .venture-photo { @apply block bg-photo; }
+  .venture-photo img { @apply aspect-[16/9] w-full object-cover; }
+  .venture-info { @apply flex flex-1 flex-col p-4; }
+  .venture-info>p:first-child { @apply flex flex-wrap items-center justify-between gap-2 text-sm font-medium text-brand; }
+  .venture-info>p:first-child span { @apply rounded bg-highlight px-2 py-1 text-xs font-bold text-ink; }
+  .venture-info h3 { @apply my-2 text-2xl; }
+  .venture-info h3 a { @apply inline-flex min-h-11 items-center no-underline hover:underline; }
+  .venture-description { @apply mb-3 text-sm text-muted; }
+  .venture-info .section-link { @apply mt-auto; }
+  .venture-products { @apply border-y border-brand/10; }
+  .market-products { @apply grid grid-cols-1 gap-4 min-[361px]:grid-cols-2 min-[801px]:grid-cols-3 min-[1100px]:grid-cols-4; }
+  .market-product { @apply flex min-w-0 flex-col overflow-hidden rounded-lg border border-card bg-white shadow-offer; }
+  .product-store-first { @apply hidden; }
+  .product-image { @apply relative block min-w-0 overflow-hidden border-b border-line; }
+  .product-image img { @apply aspect-[4/3] w-full object-cover; }
+  .offer-placeholder { @apply grid aspect-[4/3] w-full place-items-center bg-highlight/20 text-brand; }
+  .offer-placeholder svg { @apply size-16; }
+  .offer-discount { @apply absolute top-3 left-3 rounded bg-accent px-2 py-1 text-xs font-bold text-white; }
+  .product-info { @apply flex min-w-0 flex-1 flex-col p-3 min-[601px]:p-4; }
+  .product-category { @apply mb-1 text-xs font-medium text-muted; }
+  .product-info h3 { @apply font-sans text-base font-medium leading-snug; }
+  .product-info h3 a { @apply inline-flex min-h-11 items-center no-underline hover:underline; }
+  .product-store { @apply my-2 flex min-h-11 items-center gap-1.5 border-b border-line pb-2 text-xs font-bold text-brand no-underline hover:underline; }
+  .product-store svg { @apply size-4; }
+  .product-price { @apply flex flex-col items-start; }
+  .product-price del { @apply text-sm text-muted; }
+  .product-price strong { @apply text-[1.65rem] leading-tight tracking-tight min-[601px]:text-[1.9rem]; }
+  .product-price>span { @apply mt-1 text-xs font-bold text-brand; }
+  .product-delivery { @apply my-3 text-xs text-muted; }
+  .product-actions { @apply mt-auto flex flex-wrap gap-2 pt-1; }
+  .product-actions .icon-button { @apply border-brand bg-white text-brand; }
+  .product-actions .icon-button[aria-pressed=true] { @apply border-accent bg-favorite text-accent; }
+  .trades-section { @apply text-ink; }
+  .trades-grid { @apply grid gap-4 min-[768px]:grid-cols-3; }
+  .trade-card { @apply grid content-start gap-3 rounded-lg border border-card bg-white p-5 text-ink min-[1100px]:p-6; }
+  .trade-icon { @apply grid size-14 place-items-center rounded-lg bg-highlight text-brand; }
+  .trade-icon svg { @apply size-8; }
+  .trade-card h3 { @apply text-3xl; }
+  .trade-price { @apply text-2xl font-bold; }
+  .trade-price span { @apply text-sm font-normal; }
+  .merchant-invite { @apply flex flex-wrap items-center justify-between gap-5 border-t-4 border-accent py-9 min-[768px]:py-12; }
+  .merchant-invite h2 { @apply text-3xl; }
+  .merchant-invite p { @apply mt-2 max-w-[60ch]; }
+  .market-footer { @apply bg-brand py-9 text-white; }
+  .footer-main { @apply grid gap-7 min-[768px]:grid-cols-[1.5fr_1fr_1fr]; }
+  .footer-main nav a { @apply flex min-h-11 items-center text-sm; }
+  .footer-stripes { @apply mt-5 flex h-1.5 w-32; }
+  .footer-stripes span:nth-child(1) { @apply flex-1 bg-highlight; }
+  .footer-stripes span:nth-child(2) { @apply flex-1 bg-white; }
+  .footer-stripes span:nth-child(3) { @apply flex-1 bg-accent; }
+  .footer-author { @apply mt-8 flex items-start gap-4 border-t border-white/30 pt-6; }
+  .footer-author img { @apply h-14 w-16 shrink-0 rounded bg-white p-1 object-contain; }
+  .footer-author p { @apply max-w-[70ch]; }
+  .catalog-filters { @apply mb-6 flex flex-wrap items-end gap-3 rounded-lg border border-line bg-soft p-4; }
+  .catalog-filters label { @apply grid min-w-0 max-w-full flex-1 gap-2 text-sm font-bold; }
+  .catalog-filters label:first-child { @apply min-w-[min(100%,230px)] grow-2; }
+  .catalog-filters input,.catalog-filters select { @apply min-h-12 w-full min-w-0 rounded-md border border-control bg-white p-3 text-base font-normal; }
+  .access-page { @apply grid gap-7 py-9 min-[900px]:max-w-[1060px] min-[900px]:grid-cols-[.8fr_1fr] min-[900px]:gap-12 min-[900px]:py-14; }
+  .access-intro { @apply flex flex-col justify-center rounded-xl bg-brand p-6 text-white min-[900px]:p-9; }
+  .access-symbol { @apply mb-5 grid size-16 place-items-center rounded-lg bg-highlight text-brand; }
+  .access-symbol svg { @apply size-10; }
+  .access-intro h2 { @apply text-4xl; }
+  .access-intro p { @apply mt-4 max-w-[45ch]; }
+  .access-color-line { @apply mt-7 h-1 w-20 bg-accent; }
+  .access-animated-intro { @apply items-center text-center; }
+  .access-logo-surface { @apply mb-6 flex w-fit max-w-full items-center justify-center rounded-xl bg-highlight p-3; }
+  .access-animated-logo { @apply block h-[192px] w-[160px] min-[900px]:h-[216px] min-[900px]:w-[180px]; }
+  .access-animated-intro h2 { @apply max-w-[22ch] text-balance text-4xl; }
+  .access-page:has(.access-animated-intro) .access-panel { @apply max-[899px]:order-first; }
+  [data-text-size="200"] .access-animated-intro { @apply px-[12px] min-[601px]:px-[24px]; }
+  [data-text-size="200"] .access-animated-intro h2 { @apply text-[2rem]; }
+  [data-text-size="200"] .access-animated-intro p { @apply text-[1rem]; }
+  .access-panel { @apply min-w-0 rounded-xl border border-line bg-white p-5 min-[601px]:p-7; }
+  .access-panel h1 { @apply text-4xl; }
+  .access-reset { @apply my-4 inline-flex min-h-11 items-center text-sm font-bold text-brand; }
+  .access-alternative { @apply mt-6 grid gap-3 border-t border-line pt-5; }
+  [data-text-size="200"] .header-top { @apply grid-cols-[1fr_auto]; }
+  [data-text-size="200"] .market-brand { @apply col-span-2 max-[600px]:flex-wrap; }
+  [data-text-size="200"] .market-brand>span:last-child { @apply max-[600px]:basis-full; }
+  [data-text-size="200"] .market-search { @apply col-span-2 col-start-1 row-start-2; }
+  [data-text-size="200"] .header-account { @apply col-span-1 col-start-1 row-start-3 max-[600px]:col-span-2; }
+  [data-text-size="200"] .header-cart { @apply col-start-2 row-start-3 max-[600px]:row-start-4 max-[600px]:justify-self-end; }
+  [data-text-size="200"] .market-products { @apply grid-cols-1 min-[1024px]:grid-cols-2; }
+  [data-text-size="200"] .ventures-grid,[data-text-size="200"] .trades-grid { @apply grid-cols-1 min-[1024px]:grid-cols-2; }
+  [data-text-size="200"] .category-panel { @apply grid-cols-1; }
+  [data-text-size="200"] .category-links { @apply grid-cols-2 min-[768px]:grid-cols-3; }
+  [data-text-size="200"] .header-account { @apply flex flex-wrap; }
+  [data-text-size="200"] .header-account a { @apply grow; }
+  [data-text-size="200"] .access-page,[data-text-size="200"] .footer-main { @apply grid-cols-1; }
+  .accessibility-trigger[data-docked=true] { @apply static! inset-auto size-11 min-h-11 p-2 shadow-none!; }
+  #reading-slot:has([data-docked=true]) { @apply inline-flex items-center; }
+
+  .market-page-panel { @apply my-6 rounded-lg border border-card bg-white px-5; }
+}
+
+@layer components {
+  .offer-dialog { @apply max-w-[1060px]; }
+  .offer-detail-grid { @apply grid gap-7 min-[801px]:grid-cols-2; }
+  .offer-detail-photo { @apply aspect-square max-h-[500px] w-full rounded-lg bg-photo object-contain; }
+  .offer-dialog .dialog-close { @apply sticky top-0 z-2 rounded-md border border-control bg-white px-4; }
+  .service-directory { @apply mt-6 grid gap-6 min-[801px]:grid-cols-[.85fr_1.4fr]; }
+  .professional-list { @apply mt-4 grid gap-3; }
+  .professional-choice { @apply flex min-h-16 w-full flex-col items-start gap-1 rounded-lg border border-control bg-white p-4 text-left; }
+  .professional-choice span { @apply text-sm text-muted; }
+  .professional-choice[aria-pressed=true] { @apply border-2 border-brand bg-promotion; }
+  .professional-profile { @apply min-w-0 rounded-xl border border-line bg-soft p-4 min-[601px]:p-6; }
+  .professional-profile h4 { @apply mt-5 mb-3; }
+  .professional-contact { @apply my-5 flex flex-wrap gap-3; }
+  .professional-contact .button { @apply min-w-0; }
+  .image-carousel .logo-hero-layout { @apply min-[601px]:px-24; }
+  [data-text-size="200"] .offer-detail-grid,[data-text-size="200"] .service-directory { @apply grid-cols-1; }
+}
+
+@layer components {
+  #page-transition-layer { @apply pointer-events-none fixed inset-0 z-[1000] hidden overflow-clip; }
+  .transition-boat { @apply absolute left-0 top-0; width:var(--boat-size,310px);height:var(--boat-size,310px);view-transition-name:market-boat; }
+  .transition-boat-poster,.transition-boat-player { @apply absolute inset-0 size-full; }
+  .transition-boat { filter:drop-shadow(0 3px 6px #00132E22); }
+  [data-transition-phase] #page-transition-layer { @apply block; }
+  [data-transition-phase] #local-header,[data-transition-phase] #main,[data-transition-phase] #local-footer { @apply pointer-events-none; }
+  [data-transition-phase] body { @apply cursor-progress; }
+  [data-motion=reduced] #page-transition-layer { @apply hidden; }
+  @media(prefers-reduced-motion:reduce) { [data-transition-phase] #page-transition-layer { @apply hidden; } }
+}
+
+@keyframes boat-hold { from,to { opacity:1; } }
+::view-transition-group(root) { animation:none; }
+::view-transition-image-pair(root) { isolation:auto; }
+::view-transition-new(root) { animation:none;mix-blend-mode:normal;z-index:1; }
+::view-transition-old(root) {
+  animation:boat-hold 5s linear both;mix-blend-mode:normal;z-index:2;
+  mask-image:linear-gradient(90deg,#0000 0px,#0000 var(--boat-stop,0px),#000 var(--boat-edge,0px),#000 100%);
+}
+::view-transition-group(market-boat) {
+  animation:none;z-index:3;width:var(--boat-size,310px);height:var(--boat-size,310px);
+  transform:translate(var(--boat-x,-360px),var(--boat-y,0px));
+}
+::view-transition-new(market-boat) { animation:none;opacity:var(--boat-opacity,1); }
+::view-transition-old(market-boat) { display:none; }
