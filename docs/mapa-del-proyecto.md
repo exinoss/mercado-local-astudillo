@@ -1,8 +1,58 @@
 # Mapa del proyecto
 
 Revisado el 2026-10-30 sobre el código de esta copia.
+Actualización acotada de D95/D96/D99/D102/D104/D105/D106 hasta el 2026-11-06.
+D97/D98 se preservan en design/descuentos-20261105/, fuera del grafo por estar ignorado.
+D99 integra A simplificada mediante los módulos compartidos descritos abajo, sin importar design/.
+El contrato almacenado sigue siendo price final/old base; discountPercent es metadato opcional.
+No hay migración: se recuperan porcentajes de promociones anteriores conservando sus centavos.
+GRAPH_REPORT.md falta y Graphify no está disponible en esta copia; la revisión fue acotada por este
+mapa, seguida de pruebas y navegador. Las relaciones DOM/CSS indicadas no están acreditadas por el grafo.
+D102 integra B centrada de D101; referencia D100/D101 en design/descuento-desplegable-20261105/
+(ignorada), con fuentes/compilación anterior en history/d100/ y servidor4348 cerrado.
+lib/discount-view.js enlaza checkbox Agregar descuento con #offer-discount-panel mediante aria-controls;
+renderiza todo el layout hidden si no hay promoción y conserva fieldset oculto/deshabilitado.
+local/discount-controls.js sincroniza hidden del panel y controles al cambiar casilla, precio o porcentaje.
+local/discount-styles.css iguala paneles y presets; capa utilities centra .offer-editor-page, limita
+panel960px/formulario720px y centra el primer wrapper del título. views.js añade esa clase solo a
+/editar-oferta/, compartida por Agregar producto/Añadir oferta/edición. Las demás páginas conservan composición.
+La capa utilities evita que container/justify-between anulen el ajuste. No cambia el contrato D99.
+El artefacto y relaciones CSS/DOM no están cubiertos por el grafo. Pruebas de renderizado y Chrome
+confirman bloque cerrado inicial, promoción existente abierta, cinco anchos, texto200 y zoom400.
 Complementa `graphify-out/GRAPH_REPORT.md`; no sustituye las decisiones de `PROYECTO.md`.
 El grafo ayuda a localizar símbolos; este mapa describe rutas, eventos y estilos que no cubre bien.
+
+D106: `views.page` enlaza Agregar producto con `modo=producto` y usa ese contexto para
+mostrar «Añade un producto». Añadir oferta conserva el acceso genérico; edición mantiene su título.
+
+## Auditoría D105
+
+Informe: `docs/auditoria-2026-11-06.md`. `navigation-bootstrap.js` cancela el watchdog
+inicial al recibir `pagereveal`, antes de asignar el nuevo plazo. La regresión se prueba
+en `src/lib/navigation-bootstrap.test.js` con reloj/eventos simulados en VM; no demuestra
+por sí sola pintura real ni el origen de una pantalla gris. Chrome valida navegación/modal.
+`Layout.astro` conserva `#quick-title` desde el HTML inicial, reemplazado por `offerDetail`
+al abrir el diálogo. `market-ui.renderSpecialPage` adapta el recuento al singular/plural.
+`views.page` declara autocomplete off en el nombre de oferta para evitar autofill personal.
+Sin cambios de diseño/CSS ni contrato de datos. Graphify explain/affected/update no disponibles;
+se usaron este mapa y búsquedas acotadas. Suite vigente: 26 pruebas de aplicación (4019
+aserciones), más 3 del hook; build33 y recursos completos. Los recuentos históricos de
+secciones anteriores describen sus propias revisiones, no la suite actual.
+
+## Autoría de cabecera D104 · A integrada
+
+`renderHeader` de `src/local/market-ui.js` genera `.proposal-emphasis` dentro de `.header-lower`, con
+texto intacto y SVG decorativo `.proposal-frame`, rectángulos `.proposal-track/.proposal-snake`.
+`src/local/styles.css` contiene geometría adaptable, rojo canónico, ciclo5s y padding12px en texto200.
+`logo-motion.controls` publica `data-logo-paused` en raíz; CSS anima cuando está inicializado y congela
+con pausa o documento oculto. Movimiento reducido muestra borde fijo; sin JS el borde también es fijo.
+Se reutiliza botón de Accesibilidad `data-logo-pause`, ahora «Pausar logos y marco»; sessionStorage,
+restablecimiento y preferencias existentes conservados. Footer D56 intacto.
+`design/autor-propuesta-20261105/` conserva comparación D103 A/B/C y compilación anterior; no reconstruir
+sin adaptar al markup integrado, para no duplicar SVG. Servidor4349 cerrado tras registrar D104.
+Fuentes del comparador fuera del grafo por estar ignoradas. SVG/CSS/movimiento y eventos requieren
+navegador: Chrome oficial revisado en cinco anchos, texto200/zoom400, pausa y movimiento reducido.
+GRAPH_REPORT/comando Graphify siguen ausentes; affected/update intentados y búsquedas acotadas por mapa.
 
 ## Preparación D94
 
@@ -127,6 +177,23 @@ Se usa al compilar y al actualizar el navegador: evitar un segundo renderizador 
 `views.js` conserva enlaces, formularios, detalles, tiendas, cuenta, compra y estados vacíos.
 `page` selecciona el contenido según la ruta y la cuenta.
 `header` y `footer` comparten identidad, navegación, búsqueda y acciones.
+D95 (2026-11-05): la rama `/cuenta/` de `views.page` sitúa el enlace `/panel/`
+«Mi tienda» primero en el DOM y usa la clase primaria `button` (rojo corporativo).
+Reutiliza `global.css`/`theme.css`, sin estilos nuevos ni cambios al menú de cabecera.
+D96: la rama `/panel/` añade primero «Agregar producto» con `button`; «Ver mi tienda»
+usa `button secondary`. Reutiliza `/editar-oferta/` y el handler `offer` existente:
+nombre, tipo (Producto por defecto), categoría, descripción, precio y descuento (D99),
+fotografía y disponibilidad. `app.fileImage` optimiza la foto; `transition` valida el producto.
+Editar tienda y Añadir oferta conservan estilo/destino. Sin otro formulario ni CSS nuevo.
+D99: `/editar-oferta/` llama a `src/lib/discount-view.js::renderDiscountFields` tanto al crear
+como al editar. `src/lib/discount.js::discountQuote` valida y calcula centavos; `discountForOffer`
+recupera base/porcentaje desde price/old y respeta el metadato válido al editar.
+`app.render` llama a `initializeDiscountControls` de `src/local/discount-controls.js` después de
+habilitar formularios: checkbox, presets, cifra, range, errores y resumen se sincronizan por eventos.
+El handler offer envía basePrice/discountPercent (cero si se desactiva); `transition` calcula price/old
+con el helper compartido, sin confiar en precios finales del cliente. Conserva compatibilidad con
+payloads anteriores de price/old. `discount-styles.css`, importado por styles.css, comparte tokens
+Tailwind y adapta foco, lectura ampliada y movimiento reducido. Sin controles de precisión ni±1.
 `renderCard` y `renderGrid` en `market-ui.js` agrupan oferta, tienda, fotografía, precio y acciones.
 `detail` presenta la oferta y el formulario de cantidad.
 `renderHome` organiza categorías, emprendimientos nuevos, productos, promociones y oficios.

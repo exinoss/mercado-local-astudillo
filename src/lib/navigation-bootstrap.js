@@ -17,6 +17,7 @@ export function bootstrapPageNavigation(settingsKey,normalizeSettings){
     if(!valid(requested)||reduced()||event.activation?.entry?.url&&!matches(requested,event.activation.entry.url))event.viewTransition.skipTransition();
   });
   window.addEventListener('pagereveal',event=>{
+    clearTimeout(state.watchdog);
     state.departing=false;state.transition=event.viewTransition;
     event.viewTransition?.ready.catch(()=>{});
     if(!state.pending||reduced()||!event.viewTransition){event.viewTransition?.skipTransition();state.clear();return;}

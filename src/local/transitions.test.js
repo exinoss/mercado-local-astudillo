@@ -1,6 +1,7 @@
 import { test, expect } from 'bun:test';
 import { initialState } from './catalog.js';
 import { transition, cartItems } from './transitions.js';
+import {discountForOffer} from '../lib/discount.js';
 test('Cantidades, conservación de otros carritos y precios en centavos', () => {
   let state=transition(initialState(),'add',{id:'telefono',qty:99},false);state=transition(state,'add',{id:'telefono',qty:2},false);
   expect(state.carts.tecno.telefono).toBe(99);expect(()=>transition(state,'quantity',{id:'telefono',qty:100})).toThrow();
@@ -88,4 +89,35 @@ test('No acepta cero, fechas inexistentes ni cantidades importadas inválidas',(
   const state=ownShop(),shop=state.shops[0];
   for(const startedAt of ['2026-02-31','2026-02-29','2026-13-01','no-fecha'])expect(()=>transition(state,'shop',{...shop,centro:1,urbana:2,startedAt})).toThrow();
   expect(transition(state,'shop',{...shop,centro:1,urbana:2,startedAt:'2024-02-29'}).shops[0].startedAt).toBe('2024-02-29');
+});
+
+test('Publicar con porcentaje calcula el precio en el dominio y conserva pedidos históricos',()=>{
+  let state=ownShop();const shop=state.shops[0].id;
+  state=transition(state,'offer',{shop,name:'Mesa',description:'Madera',category:'Hogar',basePrice:'25.00',discountPercent:'20',price:0.01,old:1000});
+  const item=state.offers[0];expect(item.price).toBe(20);expect(item.old).toBe(25);expect(item.discountPercent).toBe(20);
+  state=transition(state,'add',{id:item.id,qty:2});
+  state=transition(state,'draft',{shop,mode:'retiro',payment:'deuna'});
+  state=transition(state,'order',state.drafts[shop]);
+  expect(state.orders[0].totalCents).toBe(4000);
+  state=transition(state,'offer',{...item,basePrice:100,discountPercent:50});
+  expect(state.offers[0].price).toBe(50);expect(state.orders[0].items[0].priceCents).toBe(2000);
+});
+
+test('Editar y retirar descuentos mantiene compatibilidad con promociones anteriores',()=>{
+  let state=ownShop();const shop=state.shops[0].id;
+  state=transition(state,'offer',{shop,name:'Mesa',description:'Madera',category:'Hogar',price:25,old:35});
+  let item=state.offers[0];state=transition(state,'offer',{...item,...discountForOffer(item),name:'Mesa editada'});
+  item=state.offers[0];expect(item.price).toBe(25);expect(item.old).toBe(35);
+  state=transition(state,'offer',{...item,basePrice:35,discountPercent:0});
+  expect(state.offers[0].price).toBe(35);expect(state.offers[0].old).toBeUndefined();
+  state=transition(state,'offer',{...item,basePrice:35,discountPercent:100});
+  expect(state.offers[0].price).toBe(0);expect(state.offers[0].old).toBe(35);
+});
+
+test('Rechaza porcentajes inválidos sin mutar datos y conserva descuentos menores a un centavo',()=>{
+  const state=ownShop(),payload={shop:state.shops[0].id,name:'Artículo',description:'Local',category:'Hogar',basePrice:25};
+  for(const discountPercent of ['',-1,101,'1.000000001'])expect(()=>transition(state,'offer',{...payload,discountPercent})).toThrow();
+  expect(()=>transition(state,'offer',{...payload,discountPercent:20},false)).toThrow();expect(state.offers).toHaveLength(0);
+  const updated=transition(state,'offer',{...payload,basePrice:'0.05',discountPercent:10});
+  expect(updated.offers[0].old).toBeUndefined();expect(discountForOffer(updated.offers[0]).discountPercent).toBe(10);
 });

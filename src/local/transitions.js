@@ -1,6 +1,7 @@
 import { catalog, cents, dollars, initialState, categories, pruneCarts } from './catalog.js';
 import {phoneNumber} from '../lib/services.js';
 import {isCalendarDate} from '../lib/market.js';
+import {discountQuote} from '../lib/discount.js';
 const text = (value, max = 350) => String(value || '').trim().slice(0, max);
 const required = (value, label, max) => { const result = text(value, max); if (!result) throw new Error(`Completa ${label}.`); return result; };
 const price = value => { const result = Number(value); if (!Number.isFinite(result) || result < 0 || result > 1000000) throw new Error('Introduce un precio válido.'); return dollars(cents(result)); };
@@ -41,14 +42,16 @@ export function transition(previous, action, payload = {}, authenticated = true)
   } else if (action === 'offer') {
     ownerShop(payload.shop); if (payload.id && !state.offers.some(item => item.id === payload.id)) throw new Error('No puedes editar esta oferta.');
     if (!categories.includes(payload.category) || payload.category === 'Todas') throw new Error('Elige una categoría.');
-    const item = { id: payload.id || crypto.randomUUID(), shop: payload.shop, name: required(payload.name, 'el nombre de la oferta', 100), category: payload.category, description: required(payload.description, 'la descripción', 350), price: price(payload.price), kind: payload.kind === 'Servicio' ? 'Servicio' : 'Producto', image: validImage(payload.image), icon: payload.kind === 'Servicio' ? 'tools' : 'shop', available: payload.available !== false };
+    const pricing=Object.hasOwn(payload,'basePrice')?discountQuote(payload.basePrice,payload.discountPercent??0):null;
+    const item = { id: payload.id || crypto.randomUUID(), shop: payload.shop, name: required(payload.name, 'el nombre de la oferta', 100), category: payload.category, description: required(payload.description, 'la descripción', 350), price: pricing?dollars(pricing.totalCents):price(payload.price), kind: payload.kind === 'Servicio' ? 'Servicio' : 'Producto', image: validImage(payload.image), icon: payload.kind === 'Servicio' ? 'tools' : 'shop', available: payload.available !== false };
     if(item.kind==='Servicio'){
       item.trade=required(payload.trade||item.name,'el oficio o especialidad',80);
       item.professional=text(payload.professional,90);
       item.activities=String(payload.activities||'').split(/\r?\n/).map(value=>text(value,160)).filter(Boolean).slice(0,20);
       for(const key of ['phone','whatsapp']){const value=text(payload[key],40);if(value&&!phoneNumber(value))throw new Error('Introduce un teléfono válido con código de país o número local.');item[key]=value?phoneNumber(value):'';}
     }
-    if (payload.old !== '' && payload.old != null) { item.old = price(payload.old); if (item.old <= item.price) throw new Error('El precio anterior debe ser mayor que el actual.'); }
+    if(pricing){item.discountPercent=pricing.discountPercent;if(pricing.savingCents>0)item.old=dollars(pricing.baseCents);}
+    else if (payload.old !== '' && payload.old != null) { item.old = price(payload.old); if (item.old <= item.price) throw new Error('El precio anterior debe ser mayor que el actual.'); }
     state.offers = [...state.offers.filter(entry => entry.id !== item.id), item];
   } else if (action === 'delete-offer') {
     if (!state.offers.some(item => item.id === payload.id)) throw new Error('Esta oferta no pertenece a tu cuenta.');

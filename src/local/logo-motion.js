@@ -15,10 +15,11 @@ playerReady.catch(()=>{});
 let data;
 const logoData=()=>data??=fetch(animationUrl).then(response=>{if(!response.ok)throw new Error('Logo no disponible');return response.json();});
 function controls(){
+  root.dataset.logoPaused=String(paused||document.hidden);
   document.querySelectorAll('[data-logo-pause]').forEach(button=>{
-    button.disabled=reduced();button.textContent=reduced()?'Logos sin movimiento':paused?'Reanudar logos':'Pausar logos';
+    button.disabled=reduced();button.textContent=reduced()?'Logos y marco sin movimiento':paused?'Reanudar logos y marco':'Pausar logos y marco';
     button.setAttribute('aria-pressed',String(paused));
-    button.setAttribute('aria-label',reduced()?'Logos sin animación por la preferencia de movimiento reducido':paused?'Reanudar animaciones de los logos':'Pausar animaciones de los logos');
+    button.setAttribute('aria-label',reduced()?'Logos y marco de autoría sin animación por la preferencia de movimiento reducido':paused?'Reanudar animaciones de los logos y del marco de autoría':'Pausar animaciones de los logos y del marco de autoría');
   });
 }
 function poster(host){const image=document.createElement('img');image.src=logoPoster;image.width=240;image.height=288;image.alt='';host.replaceChildren(image);return image;}
@@ -67,5 +68,5 @@ new MutationObserver(controls).observe(document.querySelector('#reading-dialog')
 window.addEventListener('market-motion-reset',()=>{paused=false;try{sessionStorage.removeItem(pauseKey);}catch{}for(const entry of entries.values())sync(entry);controls();});
 function preferenceChanged(){const value=reduced();if(value!==lastReduced){lastReduced=value;for(const entry of [...entries.values()])dispose(entry);mountAll();}controls();}
 new MutationObserver(preferenceChanged).observe(root,{attributes:true,attributeFilter:['data-motion']});systemMotion.addEventListener('change',preferenceChanged);
-document.addEventListener('visibilitychange',()=>{for(const entry of entries.values())sync(entry);});
+document.addEventListener('visibilitychange',()=>{for(const entry of entries.values())sync(entry);controls();});
 mountAll();

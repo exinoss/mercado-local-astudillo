@@ -1,4 +1,5 @@
 @import "../styles/global.css";
+@import "./discount-styles.css";
 @layer components {
   .market-brand-symbol { @apply grid h-20 w-15 shrink-0 place-items-center; }
   .local-form { @apply max-w-[720px]; }
@@ -38,6 +39,18 @@
   .header-lower nav { @apply flex flex-wrap gap-x-5; }
   .header-lower nav a { @apply inline-flex min-h-12 items-center text-base font-medium no-underline hover:underline; }
   .header-lower p { @apply pb-3 text-base min-[1100px]:pb-0; }
+  .header-lower .proposal-emphasis { @apply relative isolate my-2 max-w-full rounded-md px-4 py-3 text-center; }
+  .proposal-emphasis strong { @apply inline-block; }
+  [data-text-size="200"] .header-lower .proposal-emphasis { @apply px-[12px] py-[12px]; }
+  .market-header .proposal-frame { @apply pointer-events-none absolute inset-0 -z-1 size-full; }
+  .proposal-frame rect { fill:none; x:2px; y:2px; width:calc(100% - 4px); height:calc(100% - 4px); rx:5px; stroke:var(--color-accent); stroke-width:3px; }
+  .proposal-track { @apply opacity-20; }
+  .proposal-snake { stroke-linecap:round; }
+  [data-logo-paused] .proposal-snake { stroke-dasharray:22 78; animation:proposal-perimeter 5s linear infinite; }
+  [data-logo-paused=true] .proposal-snake { animation-play-state:paused; }
+  [data-motion=reduced] .proposal-snake { stroke-dasharray:none; }
+  @media (prefers-reduced-motion:reduce) { .proposal-snake { stroke-dasharray:none; } }
+  @keyframes proposal-perimeter { to { stroke-dashoffset:-100; } }
   .image-carousel { @apply relative w-full; --market-banner-fade:linear-gradient(to bottom,#000 0%,#000 76%,transparent 100%); }
   .carousel-images { @apply relative overflow-hidden; mask-image:var(--market-banner-fade); }
   .banner-link { @apply block; }

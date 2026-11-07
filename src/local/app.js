@@ -10,6 +10,7 @@ import { manageDialog } from '../lib/dialog.js';
 import { containDialogFocus } from './modal.js';
 import { money } from '../lib/market.js';
 import { approvedVariants, protectedPaths } from './routes.js';
+import {initializeDiscountControls} from './discount-controls.js';
 const namespace = document.body.dataset.namespace || 'main-v1';
 const comparison = namespace === 'proposal-review-v1';
 const repository = createRepository(namespace);
@@ -24,7 +25,7 @@ function go(destination, values = {}) { location.href = views.h(destination,valu
 function badges() { document.querySelectorAll('[data-cart-count]').forEach(badge => badge.textContent = Object.values(state.carts).reduce((sum,cart)=>sum+Object.values(cart).reduce((a,b)=>a+b,0),0)); const label = document.querySelector('[data-account-label]'); if(label) label.textContent = repository.account ? 'Mi cuenta' : 'Entrar'; const accountLink = label?.closest('a'); if(accountLink) accountLink.href = views.h(repository.account ? '/cuenta/' : '/acceso/'); }
 
 function enableLocalForms(container) { container.querySelectorAll('[data-local-fields]').forEach(fields => fields.disabled = false); }
-function render() { main.innerHTML = views.page(path,params,state,repository.account); enableLocalForms(main); badges(); updateCheckout(); restoreContext(); const title = main.querySelector('h1')?.textContent; if (title && path !== '/') document.title = `${title} | Mercado Local`; }
+function render() { main.innerHTML = views.page(path,params,state,repository.account); enableLocalForms(main); initializeDiscountControls(main); badges(); updateCheckout(); restoreContext(); const title = main.querySelector('h1')?.textContent; if (title && path !== '/') document.title = `${title} | Mercado Local`; }
 function restoreActionFocus(origin) { const attributes = ['data-add','data-favorite','data-quantity','data-receive','data-paid','data-order-status']; for (const name of attributes) if (origin.hasAttribute(name)) { const candidate = [...document.querySelectorAll(`button[${name}]`)].find(button => button.getAttribute(name) === origin.getAttribute(name) && (!origin.hasAttribute('data-status') || button.dataset.status === origin.dataset.status)); if (candidate) { candidate.focus(); return; } } main.querySelector('h1')?.focus({preventScroll:true}); }
 async function refresh(renderPage = true) { const result = await repository.read(); state = result.state; if(renderPage)render(); else badges(); return result; }
 function updateCheckout() {
@@ -92,7 +93,7 @@ document.addEventListener('submit',async event => {
     else if (action === 'draft') { await repository.mutate('draft',data); go('/compra/',{shop:data.shop,paso:'revision'}); }
     else {
       if (action === 'shop') { data.deliveryModes = fields.getAll('deliveryModes'); await fileImage(form,data); }
-      if (action === 'offer') { data.available = fields.has('available'); await fileImage(form,data); }
+      if (action === 'offer') { data.available = fields.has('available'); data.discountPercent=form.elements.promotion.checked?form.elements.discountPercent.value:0; await fileImage(form,data); }
       await repository.mutate(action,data);
       if (action === 'shop' || action === 'offer')go('/panel/'); else { await refresh(!quick.open); say(action === 'add' ? 'Oferta añadida al carrito de esta tienda.' : 'Cambios guardados.'); }
     }

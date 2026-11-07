@@ -1,0 +1,59 @@
+@layer components {
+  .discount-editor { @apply min-w-0 border-y border-line py-6; }
+  .discount-entry { @apply my-5 grid min-w-0 grid-cols-1 gap-4; }
+  .discount-price-input { @apply mt-2 flex w-full items-center gap-3 rounded border border-control bg-white px-4; }
+  .discount-price-input>span { @apply text-xl font-bold text-brand; }
+  .checkout-form .discount-editor input.discount-base { @apply min-h-14 w-0 min-w-0 flex-1 border-0 bg-transparent px-0 py-2 text-2xl font-bold text-ink; }
+  .discount-price-input:focus-within { @apply outline-3 outline-offset-3 outline-brand; }
+  .discount-price-input input:focus-visible { @apply outline-none shadow-none; }
+  .discount-hint { @apply mt-2 block text-sm leading-relaxed text-muted; }
+  .checkout-form .discount-editor label.discount-toggle { @apply flex min-h-14 cursor-pointer items-start gap-3 font-bold; }
+  .checkout-form .discount-editor .discount-toggle input { @apply mt-1 size-6 min-h-6 shrink-0 accent-brand; }
+  .discount-toggle .discount-hint { @apply font-normal; }
+  .discount-layout { @apply grid min-w-0 items-stretch gap-4 min-[900px]:grid-cols-2; }
+  .discount-card,.discount-summary { @apply min-w-0 rounded-lg border border-card bg-white p-5; }
+  .discount-card h3,.discount-summary h3 { @apply text-2xl; }
+  .discount-presets { @apply my-5 grid grid-cols-3 gap-3; }
+  .discount-presets button { @apply min-h-14 rounded border border-control bg-white px-2 py-3 font-bold text-brand; }
+  .discount-presets [aria-pressed=true] { @apply border-brand bg-highlight text-ink outline-2 outline-offset-2 outline-brand; }
+  .discount-percent-label { @apply block text-center text-sm font-bold text-brand; }
+  .discount-number-wrap { @apply mx-auto mt-2 flex w-fit max-w-full flex-wrap items-baseline justify-center gap-2 origin-center transition-transform duration-150; }
+  .discount-number-wrap.is-adjusting { @apply scale-[1.06]; }
+  .checkout-form .discount-editor input.discount-number { @apply h-[1.3em] w-[3.2ch] min-w-0 max-w-full rounded-lg border-2 border-control bg-white p-0 text-center font-heading text-[clamp(3rem,12vw,4.5rem)] leading-none font-semibold text-brand tabular-nums; }
+  .checkout-form .discount-editor [data-wide] input.discount-number { @apply w-[12ch] text-[clamp(1.5rem,5vw,2rem)]; }
+  .checkout-form .discount-editor input.discount-number[aria-invalid=true] { @apply border-danger; }
+  .discount-number-wrap>span { @apply font-heading text-3xl font-semibold text-brand; }
+  .checkout-form .discount-editor input.discount-range { @apply mt-6 block h-14 w-full min-w-0 cursor-pointer appearance-none rounded-lg border-0 bg-transparent px-0; accent-color:var(--color-brand); }
+  .discount-range::-webkit-slider-runnable-track { @apply h-2.5 rounded-full border border-control; background:linear-gradient(to right,var(--color-brand) 0 var(--discount-progress,20%),var(--color-soft) var(--discount-progress,20%) 100%); }
+  .discount-range::-webkit-slider-thumb { @apply -mt-[.6875rem] size-8 appearance-none rounded-full border-4 border-brand bg-white; }
+  .discount-range::-moz-range-track { @apply h-2.5 rounded-full border border-control bg-soft; }
+  .discount-range::-moz-range-progress { @apply h-2.5 rounded-full bg-brand; }
+  .discount-range::-moz-range-thumb { @apply size-6 rounded-full border-4 border-brand bg-white; }
+  .discount-range-labels { @apply flex items-center justify-between gap-4 text-sm font-bold text-brand; }
+  .discount-reset { @apply mx-auto mt-3 block min-h-11 px-3 text-sm font-medium text-brand underline underline-offset-4; }
+  .discount-customer-price { @apply my-5 flex flex-col items-start gap-2 border-b border-line pb-5; }
+  .discount-badge { @apply rounded-md bg-highlight px-3 py-1 text-sm font-bold text-ink; }
+  .discount-customer-price s { @apply text-lg text-muted; }
+  .discount-customer-price strong { @apply max-w-full font-heading text-[clamp(2.25rem,7vw,3.5rem)] leading-tight font-semibold text-brand tabular-nums wrap-anywhere; }
+  .discount-breakdown { @apply grid gap-3 text-sm; }
+  .discount-breakdown>div { @apply flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1; }
+  .discount-breakdown dd { @apply font-bold text-brand tabular-nums; }
+  .discount-error { @apply mt-3 text-sm font-medium text-danger; }
+  [data-text-size="200"] .discount-entry,[data-text-size="200"] .discount-layout { @apply grid-cols-1; }
+  [data-text-size="200"] .discount-presets { @apply grid-cols-2 gap-[8px]; }
+  [data-text-size="200"] .discount-presets button { @apply px-[4px]; }
+  [data-text-size="200"] .discount-price-input { @apply gap-[8px] px-[10px]; }
+  [data-text-size="200"] .discount-card,[data-text-size="200"] .discount-summary { @apply p-[10px]; }
+  :root[data-motion="reduced"] .discount-number-wrap { transform:none; }
+  @media (prefers-reduced-motion:reduce) { .discount-number-wrap { transform:none; } }
+  @media (forced-colors:active) { .discount-range { accent-color:auto; } }
+}
+.discount-number { -moz-appearance:textfield; }
+.discount-number::-webkit-inner-spin-button,.discount-number::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+
+@layer utilities {
+  .offer-editor-page { @apply max-w-[960px]; }
+  .offer-editor-page>.local-form { @apply mx-auto w-full; }
+  .offer-editor-page>div:first-child { @apply mx-auto max-w-[720px] justify-center text-center; }
+  [data-text-size="200"] .offer-editor-page { @apply px-[10px]; }
+}

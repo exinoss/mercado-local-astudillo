@@ -1,0 +1,22 @@
+import {escapeHtml as e,money} from './market.js';
+import {discountForOffer,discountQuote} from './discount.js';
+
+export function renderDiscountFields(offer={}){
+  const {basePrice,discountPercent}=discountForOffer(offer),active=discountPercent>0,percent=active?discountPercent:20;
+  const quote=basePrice!==''?discountQuote(basePrice,discountPercent):null;
+  const amount=key=>quote?money(quote[key]/100):'—';
+  return `<section class="discount-editor" data-discount-editor aria-labelledby="pricing-heading">
+    <h2 id="pricing-heading" class="text-2xl">Precio y promoción</h2>
+    <div class="discount-entry"><div><label for="base-price">Precio</label><div class="discount-price-input"><span aria-hidden="true">$</span><input class="discount-base" id="base-price" name="basePrice" type="number" min="0" max="1000000" step="0.01" value="${e(basePrice)}" inputmode="decimal" aria-describedby="base-price-hint base-price-error" required></div><p id="base-price-hint" class="discount-hint">Precio antes de aplicar el descuento.</p><p id="base-price-error" class="discount-error" role="alert" hidden></p></div>
+    <label class="discount-toggle" for="offer-promotion"><input id="offer-promotion" name="promotion" type="checkbox" aria-controls="offer-discount-panel" ${active?'checked':''}><span>Agregar descuento<span class="discount-hint">Opcional. Márcalo para definir una promoción.</span></span></label></div>
+    <div class="discount-layout" id="offer-discount-panel" data-discount-panel ${active?'':'hidden'}><section class="discount-card" aria-labelledby="discount-heading"><h3 id="discount-heading">Elige tu descuento</h3><p class="discount-hint">Usa un descuento rápido, desliza la barra o escribe el número.</p>
+      <fieldset class="contents" data-discount-fields ${active?'':'disabled hidden'}><legend class="sr-only">Porcentaje de descuento</legend>
+      <div class="discount-presets" role="group" aria-label="Descuentos rápidos">${[10,20,30].map(value=>`<button type="button" data-discount-preset="${value}" aria-pressed="${percent===value}">${value} %</button>`).join('')}</div>
+      <label class="discount-percent-label" for="discount-percent">Porcentaje de descuento</label><div class="discount-number-wrap" data-discount-number-wrap ${String(percent).length>3?'data-wide':''}><input class="discount-number" id="discount-percent" name="discountPercent" type="number" min="0" max="100" step="0.00000001" value="${e(percent)}" inputmode="decimal" aria-describedby="discount-percent-hint discount-percent-error" required><span aria-hidden="true">%</span></div>
+      <p id="discount-percent-hint" class="discount-hint text-center">Presiona el número para escribir el valor exacto.</p><p id="discount-percent-error" class="discount-error text-center" role="alert" hidden></p>
+      <label class="sr-only" for="offer-discount-range">Descuento con barra</label><input class="discount-range" id="offer-discount-range" data-discount-range type="range" min="0" max="100" step="1" value="${Math.round(percent)}" aria-valuetext="${e(percent)} por ciento" aria-describedby="offer-range-hint"><div class="discount-range-labels" aria-hidden="true"><span>0 %</span><span>100 %</span></div><p id="offer-range-hint" class="discount-hint">Desliza para elegir tu descuento.</p><button type="button" class="discount-reset" data-discount-reset>Quitar el descuento</button>
+      </fieldset></section>
+      <aside class="discount-summary" aria-labelledby="discount-summary-heading"><h3 id="discount-summary-heading">El precio para tu cliente</h3><div class="discount-customer-price"><span class="discount-badge" data-discount-badge>${active?`${e(discountPercent)} % de descuento`:'Sin descuento'}</span><s data-discount-original ${active?'':'hidden'}>${amount('baseCents')}</s><strong data-discount-final>${amount('totalCents')}</strong></div><dl class="discount-breakdown"><div><dt>Precio sin descuento</dt><dd data-discount-base>${amount('baseCents')}</dd></div><div><dt>Descuento elegido</dt><dd data-discount-percentage>${e(discountPercent)} %</dd></div><div><dt>Ahorro</dt><dd data-discount-saving>${amount('savingCents')}</dd></div></dl><p class="discount-hint" data-discount-summary-note>${quote?'El precio final se redondea a centavos.':'Escribe un precio para calcular el importe final.'}</p></aside></div>
+    <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-discount-announcement></p>
+  </section>`;
+}
