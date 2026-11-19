@@ -1,15 +1,15 @@
 import {test,expect} from 'bun:test';
 import {createViews} from './views.js';
-import {initialState,seedShops} from './catalog.js';
+import {initialState,seedShops,seedOffers} from './catalog.js';
 import {money,isNewShop} from '../lib/market.js';
 import {transition} from './transitions.js';
 
-test('La portada muestra primero los dos comercios aprobados y enlaza al listado sin el filtro de emprendimientos nuevos',()=>{
+test('La portada muestra primero los tres comercios reales (D117) y enlaza al listado sin el filtro de emprendimientos nuevos',()=>{
   const state=initialState(),views=createViews(undefined,false);
   const home=views.page('/',new URLSearchParams(),state);
   const section=home.match(/<section[^>]* id="nuevos">([\s\S]*?)<\/section>/)[1];
   const cards=[...section.matchAll(/<article class="venture-card">([\s\S]*?)<\/article>/g)].map(match=>match[1]);
-  for(const [index,id,name] of [[0,'tecnomovil','Tecnomovil'],[1,'variedades-aristi','Variedades Aristi']]){
+  for(const [index,id,name] of [[0,'flylife','Fly Life'],[1,'tecnomovil','Tecnomovil'],[2,'variedades-aristi','Variedades Aristi']]){
     const shop=seedShops.find(shop=>shop.id===id);
     expect(cards[index]).toContain(`Visitar ${name}`);
     expect(cards[index]).toContain(`href="/tiendas/${shop.slug}/"`);
@@ -98,4 +98,43 @@ test('Crear una tienda no propone una fecha de inicio inventada y el carrito anu
   const state=transition(initialState(),'add',{id:'freidora',qty:2});
   expect(views.header(state,null)).toContain('aria-label="Mis carritos: 2 productos"');
   expect(views.header(initialState(),null)).toContain('aria-label="Mis carritos: 0 productos"');
+});
+
+test('D117: Comercios incluye locales con servicios, excluye oficios independientes y ordena primero los comercios reales',()=>{
+  const views=createViews(undefined,false),html=views.page('/comercios/',new URLSearchParams(),initialState());
+  const names=[...html.matchAll(/<h3><a [^>]*>([^<]+)<\/a><\/h3>/g)].map(match=>match[1]);
+  expect(names.slice(0,3)).toEqual(['Fly Life','Tecnomovil','Variedades Aristi']);
+  for(const name of ['Bienestar Cerca','Taller Digital','Tecno San Lorenzo'])expect(names).toContain(name);
+  for(const name of ['Albañilería local','Plomería local','Electricidad local'])expect(names).not.toContain(name);
+  expect(html).toContain(`${names.length} comercios encontrados`);
+});
+
+test('D117: los servicios sin precio fijo muestran su nota, nunca un importe inventado',()=>{
+  const views=createViews(undefined,false),state=initialState();
+  const page=views.page('/catalogo/',new URLSearchParams({tipo:'servicios'}),state);
+  expect(page).toContain('<h1 class="text-4xl" tabindex="-1">Servicios</h1>');
+  expect(page).not.toContain('$0,00');
+  for(const note of ['Según el plan','Varía según el monto','Según tu planilla'])expect(page).toContain(note);
+  const first=page.match(/data-offer-card="([^"]+)"/)[1];expect(first).toBe('flylife-wifi');
+  expect(page).not.toContain('data-add="flylife-');
+  const offer=seedOffers.find(item=>item.id==='flylife-energia'),detail=views.detail(offer,state,'h2');
+  expect(detail).toContain('<strong>Precio:</strong> Según tu planilla. El valor depende de lo que adeudes.');
+  expect(detail).not.toContain('Precio publicado');
+  expect(()=>transition(state,'add',{id:'flylife-wifi'},false)).toThrow('Contacta directamente');
+  const products=views.page('/catalogo/',new URLSearchParams({tipo:'productos'}),state);
+  expect(products).toContain('>Productos</h1>');expect(products).not.toContain('flylife-');
+  expect(products.match(/data-offer-card="([^"]+)"/)[1]).toMatch(/^tecnomovil-/);
+});
+
+test('D117: menú y pie separan Productos, Servicios y Comercios; la portada muestra servicios con tarjetas comunes',()=>{
+  const views=createViews(undefined,false),state=initialState(),header=views.header(state,null),footer=views.footer();
+  const nav=header.match(/<nav aria-label="Navegación principal">([\s\S]*?)<span id="reading-slot">/)[1];
+  expect([...nav.matchAll(/>([^<]+)<\/a>/g)].map(match=>match[1])).toEqual(['Productos','Servicios','Comercios','Promociones','Mi tienda']);
+  expect(nav).toContain('href="/catalogo/?tipo=productos"');expect(nav).toContain('href="/catalogo/?tipo=servicios"');
+  expect(footer).toContain('href="/catalogo/?tipo=servicios">Servicios');
+  const home=views.page('/',new URLSearchParams(),state),services=home.match(/<section[^>]* id="oficios">([\s\S]*?)<\/section>/)[1];
+  expect(services).toContain('Servicios cerca de ti');expect(services).not.toContain('trade-card');
+  expect(services.match(/data-offer-card="([^"]+)"/)[1]).toBe('flylife-wifi');
+  const store=views.page('/tiendas/flylife/',new URLSearchParams(),state);
+  expect(store).toContain('object-contain bg-black');
 });

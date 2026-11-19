@@ -153,7 +153,7 @@ shops.push({
   id: 'tecnomovil',
   slug: 'tecnomovil',
   name: 'Tecnomovil',
-  homeFeatured: true,
+  homeFeatured: 2,
   category: 'Tecnología',
   image: 'tecnomovil/tienda-20261119.jpeg',
   description: 'Cables USB y cargadores para celulares.',
@@ -175,7 +175,7 @@ shops.push({
   id: 'variedades-aristi',
   slug: 'variedades-aristi',
   name: 'Variedades Aristi',
-  homeFeatured: true,
+  homeFeatured: 3,
   category: 'Hogar',
   image: 'aristi/tienda-20261119.jpeg',
   description: 'Blusas, ventiladores, lavadoras y televisores para tu día a día.',
@@ -191,6 +191,30 @@ offers.push(
   { id: 'aristi-ventilador', shop: 'variedades-aristi', name: 'Ventilador', category: 'Hogar', price: 25, image: 'aristi/ventilador.avif', imageFit: 'contain', kind: 'Producto', description: 'Ventilador. Consulta las características con la tienda.' },
   { id: 'aristi-lavadora', shop: 'variedades-aristi', name: 'Lavadora', category: 'Hogar', price: 180, image: 'aristi/lavadora.jpg', imageFit: 'contain', kind: 'Producto', description: 'Lavadora. Consulta las características con la tienda.' },
   { id: 'aristi-televisor', shop: 'variedades-aristi', name: 'Televisor', category: 'Tecnología', price: 150, image: 'aristi/televisor.jpeg', imageFit: 'contain', kind: 'Producto', description: 'Televisor. Consulta las características con la tienda.' },
+);
+// D117: comercio real. homeFeatured indica su posición entre los comercios destacados (1 = primero).
+// Servicios sin precio fijo: price null con priceNote/priceHint. Contacto, dirección y horario pendientes.
+shops.push({
+  id: 'flylife',
+  slug: 'flylife',
+  name: 'Fly Life',
+  homeFeatured: 1,
+  category: 'Tecnología',
+  image: 'flylife/logo.png',
+  imageFit: 'contain',
+  imageBackground: 'dark',
+  description: 'Internet WiFi, transferencias, depósitos y pago de servicios en San Lorenzo.',
+  address: 'Dirección pendiente de confirmar',
+  hours: 'Horario pendiente de confirmar',
+  contact: '',
+  delivery: 'Atención en el local',
+  deliveryModes: ['retiro'],
+  deliveryFees: {},
+});
+offers.push(
+  { id: 'flylife-wifi', shop: 'flylife', name: 'Servicio de internet WiFi', trade: 'Internet WiFi', category: 'Tecnología', kind: 'Servicio', price: null, priceNote: 'Según el plan', priceHint: 'Cotiza tu plan con Fly Life', image: 'flylife/wifi.png', imageFit: 'contain', icon: 'tech', description: 'Internet WiFi para tu hogar o negocio. El valor depende del plan que elijas: cotízalo con Fly Life.', activities: ['Planes de internet WiFi', 'Cotización según el plan'] },
+  { id: 'flylife-transferencias', shop: 'flylife', name: 'Transferencias y depósitos', trade: 'Transferencias y depósitos', category: 'Tecnología', kind: 'Servicio', price: null, priceNote: 'Varía según el monto', priceHint: 'El valor depende de la cantidad', image: 'flylife/transferencias.jpg', icon: 'tech', description: 'Realiza transferencias y depósitos en Fly Life. El valor varía según la cantidad.', activities: ['Transferencias', 'Depósitos'] },
+  { id: 'flylife-energia', shop: 'flylife', name: 'Pago de energía eléctrica', trade: 'Pago de servicios', category: 'Tecnología', kind: 'Servicio', price: null, priceNote: 'Según tu planilla', priceHint: 'El valor depende de lo que adeudes', image: 'flylife/pago-energia-cnel.jpg', imageFit: 'contain', icon: 'bolt', description: 'Paga tu planilla de energía eléctrica de CNEL EP en Fly Life. El valor depende de la deuda de cada cliente.', activities: ['Pago de planillas de energía eléctrica (CNEL EP)'] },
 );
 offers.push(...[
   {

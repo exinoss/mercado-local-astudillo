@@ -1,5 +1,13 @@
 # Mapa del proyecto
 
+D117 (2026-11-19): `src/data/catalog.js` añade Fly Life y tres servicios con `price: null`, `priceNote` y `priceHint`.
+`homeFeatured` es ahora una posición numérica (1 Fly Life, 2 Tecnomovil, 3 Aristi). En market-ui.js, `byFeatured`/`offersByFeatured`
+ordenan portada, Comercios, Productos y Servicios; `isCommerce` deja fuera de Comercios a las tiendas con `trade` sin productos.
+`priceBlock` (renderCard) y service-view muestran la nota en lugar del importe. Menú/pie: Productos y Servicios vía `?tipo=`.
+La portada usa renderGrid en «Servicios cerca de ti» (#oficios); las reglas trade-* se retiraron de styles.css. `views.image`
+respeta imageFit/imageBackground en la ficha de tienda; `.venture-photo .offer-placeholder` es 16:9. Comparador elegido (B)
+conservado en design/servicios-flylife-20261119/, cerrado.
+
 D115 (2026-11-19): auditoría en docs/auditoria-2026-11-19.md. `views.js` centraliza `paymentLabel` para revisión,
 pago y detalle de pedido; `market-ui.cartLabel` da el nombre accesible del carrito en la cabecera y
 `app.badges` lo actualiza junto al contador. Identificadores en atributos de acciones pasan por escapeHtml.
