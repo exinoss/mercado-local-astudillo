@@ -91,7 +91,7 @@
   .category-panel { @apply relative z-3 grid gap-5 rounded-xl border border-line bg-white p-5 shadow-offer min-[768px]:-mt-2 min-[1100px]:grid-cols-[210px_1fr] min-[1100px]:items-center min-[1100px]:p-6; }
   .category-panel h2 { @apply text-2xl; }
   .category-panel p { @apply mt-2 text-sm text-muted; }
-  .category-links { @apply grid grid-cols-3 gap-2 min-[601px]:grid-cols-5; }
+  .category-links { @apply grid grid-cols-3 gap-2 min-[601px]:grid-cols-6; }
   .category-links a { @apply flex min-h-20 flex-col items-center justify-center gap-2 rounded-lg border border-transparent px-1 py-2 text-center text-sm font-bold text-brand no-underline hover:border-brand hover:bg-soft; }
   .category-links a span { @apply grid size-11 place-items-center rounded-full bg-highlight/30; }
   .category-links svg { @apply size-6; }

@@ -11,6 +11,7 @@ export const icons = {
     food: '<path d="M5 10h14l-2 10H7ZM3 10h18M8 10l4-7 4 7M10 14v3M14 14v3"/>',
     tools: '<path d="M14 4a5 5 0 0 0-6 6l-5 5a3 3 0 0 0 4 4l5-5a5 5 0 0 0 6-6l-3 3-3-3 3-3Z"/>',
     home: '<path d="m3 11 9-8 9 8M5 9v12h14V9M9 21v-7h6v7"/>',
+    fashion: '<path d="m8 3-4 2-3 5 4 2v9h14v-9l4-2-3-5-4-2a4 4 0 0 1-8 0Z"/>',
     all: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
     institution: '<path d="m3 8 9-5 9 5ZM3 21h18M5 9v9M10 9v9M14 9v9M19 9v9"/>'
   };

@@ -1,4 +1,4 @@
-export const categories = ['Todas', 'Salud', 'Tecnología', 'Comida', 'Ferretería', 'Hogar'];
+export const categories = ['Todas', 'Salud', 'Tecnología', 'Comida', 'Ferretería', 'Hogar', 'Moda'];
   const shopExamples = [
     { id: 'tecno', name: 'Tecno San Lorenzo', category: 'Tecnología', image: 'comercio/tecno.png', rating: 4.8, group: 'best', description: 'Equipos y accesorios para tu día a día.', delivery: 'Retiro y entrega a domicilio' },
     { id: 'frutos', name: 'Frutos de mi Tierra', category: 'Comida', image: 'comercio/alimentos.png', rating: 4.9, group: 'best', description: 'Alimentos y canastas para compartir en casa.', delivery: 'Retiro y entrega a domicilio' },
@@ -20,7 +20,7 @@ export const categories = ['Todas', 'Salud', 'Tecnología', 'Comida', 'Ferreter�
     { id: 'escritorio', name: 'Escritorio para tu hogar', category: 'Hogar', shop: 'hogar', price: 120, image: 'products/escritorio.jpg', kind: 'Producto', description: 'Un espacio de trabajo para tu hogar.' }
   );
 
-export const categoryIcons = { Todas: "all", Salud: "health", Tecnología: "tech", Comida: "food", Ferretería: "tools", Hogar: "home" };
+export const categoryIcons = { Todas: "all", Salud: "health", Tecnología: "tech", Comida: "food", Ferretería: "tools", Hogar: "home", Moda: "fashion" };
 
 const shopImages = { tecno:'tecnologia', frutos:'comida', ferreteria:'ferreteria', hogar:'hogar', bienestar:'salud', taller:'taller' };
 const slugs = { tecno:'tecno-san-lorenzo', frutos:'frutos-de-mi-tierra', ferreteria:'ferreteria-el-progreso', hogar:'hogar-y-estilo', bienestar:'bienestar-cerca', taller:'taller-digital' };
@@ -148,6 +148,50 @@ shops.push(...[
     "icon": "bolt"
   }
 ]);
+
+shops.push({
+  id: 'tecnomovil',
+  slug: 'tecnomovil',
+  name: 'Tecnomovil',
+  homeFeatured: true,
+  category: 'Tecnología',
+  image: 'tecnomovil/tienda-20261119.jpeg',
+  description: 'Cables USB y cargadores para celulares.',
+  address: 'Dirección pendiente de confirmar',
+  hours: 'Horario pendiente de confirmar',
+  contact: '',
+  delivery: 'Retiro en el local',
+  deliveryModes: ['retiro'],
+  deliveryFees: {},
+});
+offers.push(
+  { id: 'tecnomovil-cable-usb-v8', shop: 'tecnomovil', name: 'Cable USB V8', category: 'Tecnología', price: 3.5, image: 'tecnomovil/cable-usb-v8.webp', kind: 'Producto', description: 'Cable USB con conector micro USB (V8).' },
+  { id: 'tecnomovil-cable-usb-tipo-c', shop: 'tecnomovil', name: 'Cable USB tipo C', category: 'Tecnología', price: 5, image: 'tecnomovil/cable-usb-tipo-c.jpeg', kind: 'Producto', description: 'Cable USB tipo C para dispositivos compatibles.' },
+  { id: 'tecnomovil-cargador-18w', shop: 'tecnomovil', name: 'Cargador de 18W', category: 'Tecnología', price: 10, image: 'tecnomovil/cargador-18w.png', kind: 'Producto', description: 'Cargador de 18W para dispositivos compatibles.' },
+  { id: 'tecnomovil-cargador-vehicular', shop: 'tecnomovil', name: 'Cargador Vehicular', category: 'Tecnología', price: 7, image: 'tecnomovil/cargador-vehicular.webp', kind: 'Producto', description: 'Cargador para vehículo.' },
+);
+
+shops.push({
+  id: 'variedades-aristi',
+  slug: 'variedades-aristi',
+  name: 'Variedades Aristi',
+  homeFeatured: true,
+  category: 'Hogar',
+  image: 'aristi/tienda-20261119.jpeg',
+  description: 'Blusas, ventiladores, lavadoras y televisores para tu día a día.',
+  address: 'Dirección pendiente de confirmar',
+  hours: 'Horario pendiente de confirmar',
+  contact: '',
+  delivery: 'Retiro en el local',
+  deliveryModes: ['retiro'],
+  deliveryFees: {},
+});
+offers.push(
+  { id: 'aristi-blusa', shop: 'variedades-aristi', name: 'Blusa', category: 'Moda', price: 12, image: 'aristi/blusa-sin-fondo.png', imageFit: 'contain', kind: 'Producto', description: 'Blusa. Consulta las tallas y la disponibilidad con la tienda.' },
+  { id: 'aristi-ventilador', shop: 'variedades-aristi', name: 'Ventilador', category: 'Hogar', price: 25, image: 'aristi/ventilador.avif', imageFit: 'contain', kind: 'Producto', description: 'Ventilador. Consulta las características con la tienda.' },
+  { id: 'aristi-lavadora', shop: 'variedades-aristi', name: 'Lavadora', category: 'Hogar', price: 180, image: 'aristi/lavadora.jpg', imageFit: 'contain', kind: 'Producto', description: 'Lavadora. Consulta las características con la tienda.' },
+  { id: 'aristi-televisor', shop: 'variedades-aristi', name: 'Televisor', category: 'Tecnología', price: 150, image: 'aristi/televisor.jpeg', imageFit: 'contain', kind: 'Producto', description: 'Televisor. Consulta las características con la tienda.' },
+);
 offers.push(...[
   {
     "id": "cesta-temporada",
