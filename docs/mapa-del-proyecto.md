@@ -1,7 +1,83 @@
 # Mapa del proyecto
 
+D115 (2026-11-19): auditoría en docs/auditoria-2026-11-19.md. `views.js` centraliza `paymentLabel` para revisión,
+pago y detalle de pedido; `market-ui.cartLabel` da el nombre accesible del carrito en la cabecera y
+`app.badges` lo actualiza junto al contador. Identificadores en atributos de acciones pasan por escapeHtml.
+El alta de tienda deja vacío startedAt.
+D116: dependencias actualizadas (astro 7.4.13, Tailwind 4.3.5, sqlite-wasm 3.54.1). Graphify 0.9.97 disponible:
+GRAPH_REPORT regenerado sin IA. paymentLabel, por ser local a createViews, no aparece como nodo; cartLabel sí.
+
+D114 (2026-11-19): Tecnomovil y Variedades Aristi llevan `homeFeatured: true` en el catálogo.
+`market-ui.renderHome` reúne destacados explícitos y emprendimientos de `isNewShop`, ordena
+los destacados primero y conserva el límite de cuatro tarjetas y `shopCard` compartido.
+El bloque «Comercios de San Lorenzo» enlaza a `/comercios/` sin `nuevos=si`; las dos tiendas
+aprobadas no vuelven a quedar ocultas al abrir el listado desde portada. `isNewShop` mantiene
+los seis meses desde startedAt y no se inventan fechas para las tiendas reales.
+La regresión en views.test.js verifica las dos primeras tarjetas, fotos, enlaces, ausencia
+de fechas inventadas y acceso al listado completo. Suite28/4038 aserciones+3hook; build35/116.
+Servidores detenidos por petición expresa. Revisión visual estática, sin ejecutar la aplicación,
+en `design/portada-comercios-20261119/`: HTML de dist con recursos embebidos y dos fichas locales.
+Acciones ajenas a esa revisión desactivadas; no sustituye las pruebas de lógica de la aplicación.
+Graphify explain isNewShop/update intentados, todavía sin herramienta ni informe disponibles.
+
+D113 (2026-11-19): el usuario aprueba ambas vistas presentadas y su aplicación al proyecto.
+Las páginas de la vista previa usan las mismas fuentes de src/ y recursos de public/ que
+la aplicación principal. Verificadas las dos referencias de fotos y el PNG de la blusa;
+HTML e imágenes exactas servidas por4321. No se incorpora el prototipo histórico D109.
+La aprobación confirma D108/D110/D111/D112, sin duplicar componentes ni cambiar lógica.
+Vista previa4352 cerrada tras registrar D113; principal conservado. Check:dist35/116 y
+check:repo153 correctos. Chrome dev volvió a mostrar gris; HTTP principal y compilación
+verificados, sin atribuir causa ni acreditar revisión visual correcta del desarrollo.
+
+D112 (2026-11-19): las tiendas tecnomovil y variedades-aristi de `src/data/catalog.js`
+referencian respectivamente `tecnomovil/tienda-20261119.jpeg` y `aristi/tienda-20261119.jpeg`.
+Son copias exactas de las dos nuevas fotos aportadas, ambas1448×1086; las versiones tienda.jpeg
+siguen conservadas. seedShops adapta las rutas y el mismo dato llega a fichas y tarjetas.
+No cambia la composición, la imagen fija ni los productos. Build35 páginas/116 archivos/42.49MiB,
+referencias completas, JPEG HTTP200/bytes idénticos y ambas fichas revisadas en Chrome compilado.
+Graphify explain seedShops/update intentados sin disponibilidad; búsqueda acotada por este mapa.
+
+D111 (2026-11-19): la oferta aristi-blusa de `src/data/catalog.js` referencia ahora
+`aristi/blusa-sin-fondo.png`, edición con imagegen integrado y canal alfa real (1086×1448).
+`public/images/aristi/blusa.jpeg` queda conservada como original. Adaptador, tarjetas y detalle
+consumen la misma referencia; sin cambios de renderizado ni estilos. Build35 páginas/114 archivos,
+referencias completas y ficha visual comprobada en Chrome sobre la compilación temporal.
+Graphify explain seedOffers/update intentados; herramienta e informe siguen ausentes.
+
+D110 (2026-11-19): Variedades Aristi integrada desde `src/data/catalog.js`, con una imagen
+fija del negocio y cuatro ofertas. `/tiendas/variedades-aristi/` usa la ruta estática y las vistas
+existentes; los cinco originales están en `public/images/aristi/`. No hay galería de tienda nueva.
+`imageFit: 'contain'` de sus productos llega por `seedOffers` al helper `photo` de market-ui.js,
+que añade la utilidad object-contain sin cambiar las fotos restantes. Moda amplía categories;
+categoryIcons se exporta desde el adaptador local y se comparte en market-ui, sin mapa duplicado.
+El SVG fashion está en lib/icons.js; category-links en styles.css distribuye seis columnas desde601px,
+tres en móvil y conserva la redistribución específica de lectura ampliada. renderSpecialPage filtra
+comercios por categoría propia o por una de sus ofertas disponibles; catalog ya excluye las retiradas.
+La regresión en views.test.js comprueba coincidencias por oferta, categoría propia y disponibilidad.
+Estado de D110: trece tiendas/veintiuna ofertas; suite27/4024 aserciones y3 del hook;
+build35 páginas/113 archivos. Fotos, filtros y cotización de retiro367 comprobados.
+Chrome sobre compilación local confirma foto fija, productos, modal y navegación a Moda/Aristi;
+cinco anchos emulados, capturas finales320/1440, categorías con texto200 y tienda con zoom400.
+La pantalla gris del desarrollo se reprodujo; se documenta como límite, no como fallo de catálogo.
+Graphify/GRAPH_REPORT siguen ausentes: consultas explain/affected y update intentados sin instalación;
+estas relaciones CSS/DOM se localizaron mediante este mapa y búsquedas acotadas, no con el grafo.
+
+D109 (2026-11-19, sustituida por D110): comparador independiente en `design/aristi-20261119/`.
+Prototipo ignorado y fuera del grafo; no importado desde `src/`. `data.js` reúne tienda/productos;
+`preview.js` reutiliza `createViews`, `transition`, diálogos y foco; `gallery.js` aporta renderizado
+y controlador de fotos con pausa/movimiento reducido. Opciones A/B/C y clases Tailwind en styles.css.
+La opción panorámica y lectura200 se sitúan en capa utilities para prevalecer sobre grid de la vista.
+Galería no integrada; artefacto preservado sin reconstruir sobre las fuentes de D110, servidor4351 cerrado.
+
 Revisado el 2026-10-30 sobre el código de esta copia.
 Actualización acotada de D95/D96/D99/D102/D104/D105/D106 hasta el 2026-11-06.
+D108 (2026-11-19): `src/data/catalog.js` añade Tecnomovil y cuatro productos en Tecnología.
+`src/local/catalog.js` adapta las cinco imágenes de `public/images/tecnomovil/`;
+`src/pages/tiendas/[slug].astro` genera `/tiendas/tecnomovil/` desde `seedShops`.
+Las vistas, filtros, detalle y carrito compartidos consumen esos mismos datos, sin otro renderizador.
+En D108 había doce tiendas y diecisiete ofertas; compilación de treinta y cuatro páginas.
+Los datos comerciales desconocidos no se rellenan con ejemplos; retiro es la única modalidad.
+GRAPH_REPORT y Graphify siguen ausentes: explain/affected/update intentados; cobertura sin regenerar.
 D97/D98 se preservan en design/descuentos-20261105/, fuera del grafo por estar ignorado.
 D99 integra A simplificada mediante los módulos compartidos descritos abajo, sin importar design/.
 El contrato almacenado sigue siendo price final/old base; discountPercent es metadato opcional.

@@ -24,10 +24,10 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@sqlite.org/sqlite-wasm": "^3.53.4-build2",
-    "@tailwindcss/vite": "^4.3.3",
-    "astro": "^7.3.6",
-    "tailwindcss": "^4.3.3"
+    "@sqlite.org/sqlite-wasm": "^3.54.1-build1",
+    "@tailwindcss/vite": "^4.3.5",
+    "astro": "^7.4.13",
+    "tailwindcss": "^4.3.5"
   },
   "trustedDependencies": ["esbuild"]
 }

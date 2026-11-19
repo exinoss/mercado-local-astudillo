@@ -9,6 +9,7 @@ import { readingControls } from '../lib/accessibility-view.js';
 import { manageDialog } from '../lib/dialog.js';
 import { containDialogFocus } from './modal.js';
 import { money } from '../lib/market.js';
+import { cartLabel } from './market-ui.js';
 import { approvedVariants, protectedPaths } from './routes.js';
 import {initializeDiscountControls} from './discount-controls.js';
 const namespace = document.body.dataset.namespace || 'main-v1';
@@ -22,7 +23,7 @@ let state = initialState(), ready = false, feedbackTimer, storageProblem = '';
 function say(message) { const modalStatus=document.querySelector('#quick-dialog[open] [data-offer-feedback]');if(modalStatus){modalStatus.textContent=message;modalStatus.hidden=false;return;}status.textContent = message; status.hidden = false; clearTimeout(feedbackTimer); feedbackTimer = setTimeout(() => status.hidden = true, 6000); }
 function safeNext(value) { if (!value || !value.startsWith('/') || value.startsWith('//')) return '/cuenta/'; const url = new URL(value,location.origin); return url.origin === location.origin ? url.pathname + url.search : '/cuenta/'; }
 function go(destination, values = {}) { location.href = views.h(destination,values); }
-function badges() { document.querySelectorAll('[data-cart-count]').forEach(badge => badge.textContent = Object.values(state.carts).reduce((sum,cart)=>sum+Object.values(cart).reduce((a,b)=>a+b,0),0)); const label = document.querySelector('[data-account-label]'); if(label) label.textContent = repository.account ? 'Mi cuenta' : 'Entrar'; const accountLink = label?.closest('a'); if(accountLink) accountLink.href = views.h(repository.account ? '/cuenta/' : '/acceso/'); }
+function badges() { const count = Object.values(state.carts).reduce((sum,cart)=>sum+Object.values(cart).reduce((a,b)=>a+b,0),0); document.querySelectorAll('[data-cart-count]').forEach(badge => { badge.textContent = count; badge.closest('a')?.setAttribute('aria-label',cartLabel(count)); }); const label = document.querySelector('[data-account-label]'); if(label) label.textContent = repository.account ? 'Mi cuenta' : 'Entrar'; const accountLink = label?.closest('a'); if(accountLink) accountLink.href = views.h(repository.account ? '/cuenta/' : '/acceso/'); }
 
 function enableLocalForms(container) { container.querySelectorAll('[data-local-fields]').forEach(fields => fields.disabled = false); }
 function render() { main.innerHTML = views.page(path,params,state,repository.account); enableLocalForms(main); initializeDiscountControls(main); badges(); updateCheckout(); restoreContext(); const title = main.querySelector('h1')?.textContent; if (title && path !== '/') document.title = `${title} | Mercado Local`; }
