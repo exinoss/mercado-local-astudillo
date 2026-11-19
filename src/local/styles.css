@@ -104,6 +104,8 @@
   .venture-card { @apply flex min-w-0 flex-col overflow-hidden rounded-lg border border-card bg-white; }
   .venture-photo { @apply block bg-photo; }
   .venture-photo img { @apply aspect-[16/9] w-full object-cover; }
+  .venture-photo .offer-placeholder { @apply aspect-[16/9]; }
+  .venture-photo.is-dark { @apply bg-black; }
   .venture-info { @apply flex flex-1 flex-col p-4; }
   .venture-info>p:first-child { @apply flex flex-wrap items-center justify-between gap-2 text-sm font-medium text-brand; }
   .venture-info>p:first-child span { @apply rounded bg-highlight px-2 py-1 text-xs font-bold text-ink; }
@@ -130,18 +132,13 @@
   .product-price del { @apply text-sm text-muted; }
   .product-price strong { @apply text-[1.65rem] leading-tight tracking-tight min-[601px]:text-[1.9rem]; }
   .product-price>span { @apply mt-1 text-xs font-bold text-brand; }
+  .service-quote strong { @apply text-2xl; }
+  .service-quote>span { @apply text-sm font-normal text-muted; }
   .product-delivery { @apply my-3 text-xs text-muted; }
   .product-actions { @apply mt-auto flex flex-wrap gap-2 pt-1; }
   .product-actions .icon-button { @apply border-brand bg-white text-brand; }
   .product-actions .icon-button[aria-pressed=true] { @apply border-accent bg-favorite text-accent; }
   .trades-section { @apply text-ink; }
-  .trades-grid { @apply grid gap-4 min-[768px]:grid-cols-3; }
-  .trade-card { @apply grid content-start gap-3 rounded-lg border border-card bg-white p-5 text-ink min-[1100px]:p-6; }
-  .trade-icon { @apply grid size-14 place-items-center rounded-lg bg-highlight text-brand; }
-  .trade-icon svg { @apply size-8; }
-  .trade-card h3 { @apply text-3xl; }
-  .trade-price { @apply text-2xl font-bold; }
-  .trade-price span { @apply text-sm font-normal; }
   .merchant-invite { @apply flex flex-wrap items-center justify-between gap-5 border-t-4 border-accent py-9 min-[768px]:py-12; }
   .merchant-invite h2 { @apply text-3xl; }
   .merchant-invite p { @apply mt-2 max-w-[60ch]; }
@@ -156,7 +153,7 @@
   .footer-author img { @apply h-14 w-16 shrink-0 rounded bg-white p-1 object-contain; }
   .footer-author p { @apply max-w-[70ch]; }
   .catalog-filters { @apply mb-6 flex flex-wrap items-end gap-3 rounded-lg border border-line bg-soft p-4; }
-  .catalog-filters label { @apply grid min-w-0 max-w-full flex-1 gap-2 text-sm font-bold; }
+  .catalog-filters label { @apply grid min-w-[min(100%,10rem)] max-w-full flex-1 gap-2 text-sm font-bold; }
   .catalog-filters label:first-child { @apply min-w-[min(100%,230px)] grow-2; }
   .catalog-filters input,.catalog-filters select { @apply min-h-12 w-full min-w-0 rounded-md border border-control bg-white p-3 text-base font-normal; }
   .access-page { @apply grid gap-7 py-9 min-[900px]:max-w-[1060px] min-[900px]:grid-cols-[.8fr_1fr] min-[900px]:gap-12 min-[900px]:py-14; }
@@ -185,7 +182,7 @@
   [data-text-size="200"] .header-account { @apply col-span-1 col-start-1 row-start-3 max-[600px]:col-span-2; }
   [data-text-size="200"] .header-cart { @apply col-start-2 row-start-3 max-[600px]:row-start-4 max-[600px]:justify-self-end; }
   [data-text-size="200"] .market-products { @apply grid-cols-1 min-[1024px]:grid-cols-2; }
-  [data-text-size="200"] .ventures-grid,[data-text-size="200"] .trades-grid { @apply grid-cols-1 min-[1024px]:grid-cols-2; }
+  [data-text-size="200"] .ventures-grid { @apply grid-cols-1 min-[1024px]:grid-cols-2; }
   [data-text-size="200"] .category-panel { @apply grid-cols-1; }
   [data-text-size="200"] .category-links { @apply grid-cols-2 min-[768px]:grid-cols-3; }
   [data-text-size="200"] .header-account { @apply flex flex-wrap; }
